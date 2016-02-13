@@ -69,7 +69,7 @@ https://github.com/tomtor/PDOK-demo-app
 		function markersReceived() {
 			if (ajaxRequest.readyState == 4) {
 				if (ajaxRequest.status == 200) {
-					plotlist=eval("(" + ajaxRequest.responseText + ")");
+					var plotlist= eval("(" + ajaxRequest.responseText + ")");
 					for (i=0;i<plotlist.length;i++) {
 						L.geoJson(plotlist[i], {
 						    pointToLayer: function (feature, latlng) {
@@ -84,9 +84,8 @@ https://github.com/tomtor/PDOK-demo-app
 
 		function onMapClick(e) {
 			L.marker(e.latlng).addTo(map)
-
 				.bindPopup("<b>" + e.latlng + "</b><br />Permanent Marker.").openPopup();
-			gjf = {
+			var gjf = {
 			    "type": "Feature",
 			    "geometry": {
 				"type": "Point",
@@ -103,6 +102,7 @@ https://github.com/tomtor/PDOK-demo-app
 		map.on('click', onMapClick);
 
 	</script>
+
 <p>This demo shows how to add data to a Leaflet map layer.</p>
 
 <p>On each mouse click a new object is added to the map and made visible for every user.</p>
