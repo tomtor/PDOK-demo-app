@@ -69,7 +69,7 @@ https://github.com/tomtor/PDOK-demo-app
 		function markersReceived() {
 			if (ajaxRequest.readyState == 4) {
 				if (ajaxRequest.status == 200) {
-					var plotlist= eval("(" + ajaxRequest.responseText + ")");
+					var plotlist= JSON.parse(ajaxRequest.responseText);
 					for (i=0;i<plotlist.length;i++) {
 						L.geoJson(plotlist[i], {
 						    pointToLayer: function (feature, latlng) {
