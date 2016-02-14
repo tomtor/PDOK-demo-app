@@ -47,7 +47,7 @@ class MyServer(BaseHTTPRequestHandler):
             for r in c.execute("SELECT uuid, location FROM markers") :
                 try :
                     js= json.loads(r[1])
-                    js["properties"]={"uuid": r[0]}
+                    js["properties"]["uuid"]= r[0]
                     row = json.dumps(js)
                 except :
                     print("Unexpected error:", sys.exc_info()[0])
