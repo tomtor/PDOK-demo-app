@@ -1,6 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib.request
 import time
+import uuid
+import json
+import sys
 
 import sqlite3
 
@@ -14,7 +17,7 @@ c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS requests
              (path text)''')
 c.execute('''CREATE TABLE IF NOT EXISTS markers
-             (location text)''')
+             (uuid text, location text)''')
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -36,17 +39,24 @@ class MyServer(BaseHTTPRequestHandler):
         print(self.path)
 
         if r[:5] == '/add/' :
-            c.execute("INSERT INTO markers (location) VALUES (?)", (r[5:],) )
+            c.execute("INSERT INTO markers (uuid, location) VALUES (?,?)", (str(uuid.uuid1()), r[5:]) )
 
         elif r[:5] == '/get/' :
             self.wfile.write(bytes('[', "utf-8") )
             first = True
-            for row in c.execute("SELECT location FROM markers") :
+            for r in c.execute("SELECT uuid, location FROM markers") :
+                try :
+                    js= json.loads(r[1])
+                    js["properties"]={"uuid": r[0]}
+                    row = json.dumps(js)
+                except :
+                    print("Unexpected error:", sys.exc_info()[0])
+                    row = r[1]
                 if first :
-                    self.wfile.write(bytes(row[0], "utf-8") )
+                    self.wfile.write(bytes(row, "utf-8") )
                     first = False
                 else :
-                    self.wfile.write(bytes(', ' + row[0], "utf-8") )
+                    self.wfile.write(bytes(', ' + row, "utf-8") )
             self.wfile.write(bytes(']', "utf-8") )
             return
 
