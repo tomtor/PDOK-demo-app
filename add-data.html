@@ -93,7 +93,8 @@ https://github.com/tomtor/PDOK-demo-app
 					"<option value=\"Building\">Building</option>" +
 				"</select><br/>" +
 				"<br/><button id=\"addButton\" type=\"button\">Add</button>";
-			L.marker(e.latlng).addTo(map).bindPopup(pu).openPopup();
+			var mark = L.marker(e.latlng);
+			mark.addTo(map).bindPopup(pu).openPopup();
 
 			var button = document.getElementById("addButton");
 			button.onclick = function() {
@@ -114,6 +115,9 @@ https://github.com/tomtor/PDOK-demo-app
 			ajaxRequest.open('GET', msg, true);
 			ajaxRequest.send(null);
 			map.closePopup();
+			pu = "Name: <b>" + gjf.properties.name + "</b><br/>" +
+				"Object type: <b>" +  gjf.properties.kind + "</b>";
+			mark.addTo(map).bindPopup(pu);
 			}
 		}
 
