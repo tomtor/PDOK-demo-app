@@ -20,6 +20,8 @@ https://github.com/tomtor/PDOK-demo-app
 	<script src="http://rawgithub.com/kartena/Proj4Leaflet/master/lib/proj4-compressed.js"></script>
 	<script src="http://v7f.eu/public/PDOK/proj4leaflet.js"></script>
 	<script>
+		var server = 'http://v7f.eu/pdok-demo-data/d89d5ee2-d347-11e5-9d78-bcaec5c2cce2';
+
 		var res = [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420];
 
 		var RDM = new L.Proj.CRS.TMS(
@@ -54,7 +56,7 @@ https://github.com/tomtor/PDOK-demo-app
 
 		var popup = L.popup();
 
-		var msg='http://v7f.eu/pdok-demo-data/get/';
+		var msg= server + '/get/';
 		ajaxRequest.onreadystatechange = markersReceived;
 		ajaxRequest.open('GET', msg, true);
 		ajaxRequest.send(null);
@@ -118,7 +120,7 @@ https://github.com/tomtor/PDOK-demo-app
 				}
 			};
 
-			var msg='http://v7f.eu/pdok-demo-data/add/' + JSON.stringify(gjf);
+			var msg= server + '/add/' + JSON.stringify(gjf);
 			ajaxRequest.onreadystatechange = null;
 			ajaxRequest.open('GET', msg, true);
 			ajaxRequest.send(null);

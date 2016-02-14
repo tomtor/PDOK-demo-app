@@ -35,13 +35,14 @@ class MyServer(BaseHTTPRequestHandler):
             return
 
         r = urllib.request.unquote(self.path)
-        r = r[15:] # strip /pdok-demo-data/
+        q = r.split('/')
+        key = q[2]
         print(self.path)
 
-        if r[:5] == '/add/' :
-            c.execute("INSERT INTO markers (uuid, location) VALUES (?,?)", (str(uuid.uuid1()), r[5:]) )
+        if q[3] == 'add' :
+            c.execute("INSERT INTO markers (uuid, location) VALUES (?,?)", (str(uuid.uuid1()), q[4]) )
 
-        elif r[:5] == '/get/' :
+        elif q[3] == 'get' :
             self.wfile.write(bytes('[', "utf-8") )
             first = True
             for r in c.execute("SELECT uuid, location FROM markers") :
