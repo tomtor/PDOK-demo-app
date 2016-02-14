@@ -9,7 +9,10 @@ https://github.com/tomtor/PDOK-demo-app
 	<title>PDOK Leaflet Example</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+-->
+	<link rel="stylesheet" href="leaflet.css" />
 </head>
 <body>
 	<div id="map" style="width: 600px; height: 500px"></div>
@@ -69,7 +72,8 @@ https://github.com/tomtor/PDOK-demo-app
 					};
 					var plotlist= JSON.parse(ajaxRequest.responseText);
 					for (i=0;i<plotlist.length;i++) {
-						pu = "Name: <b>" + plotlist[i].properties.name + "</b>";
+						pu = "Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
+							"Object type: <b>" + plotlist[i].properties.kind + "</b>";
 						L.geoJson(plotlist[i], {
 						    pointToLayer: function (feature, latlng) {
 								return L.circleMarker(latlng, geojsonMarkerOptions);
@@ -81,27 +85,35 @@ https://github.com/tomtor/PDOK-demo-app
 		}
 
 		function onMapClick(e) {
-			var pu = "Marker at <b>" + e.latlng + "</b><form><br />Name: <input id=\"nameInput\" type=\"text\"/><br/><br/><input id=\"addButton\" type=\"submit\"/></form>";
-			L.marker(e.latlng).addTo(map)
-				.bindPopup(pu).openPopup();
+			var pu = "Marker at <b>" + e.latlng + "</b>" +
+				"<br />Name: <input id=\"nameInput\" type=\"text\"/><br/><br/>" +
+				"<select id=\"selInput\">" +
+					"<option value=\"Animal\">Animal</option>" +
+					"<option value=\"Tree\">Tree</option>" +
+					"<option value=\"Building\">Building</option>" +
+				"</select><br/>" +
+				"<br/><button id=\"addButton\" type=\"button\">Add</button>";
+			L.marker(e.latlng).addTo(map).bindPopup(pu).openPopup();
 
 			var button = document.getElementById("addButton");
 			button.onclick = function() {
-			var gjf = {
-			    "type": "Feature",
-			    "geometry": {
-				"type": "Point",
-				"coordinates": [ e.latlng.lng , e.latlng.lat ]
-			    },
-			    "properties" : {
-				"name" : document.getElementById("nameInput").value,
-			    }
+				var gjf = {
+			   	"type": "Feature",
+			   	"geometry": {
+					"type": "Point",
+					"coordinates": [ e.latlng.lng , e.latlng.lat ]
+			   	},
+				"properties" : {
+					"name" : document.getElementById("nameInput").value,
+					"kind" : document.getElementById("selInput").value,
+				}
 			};
 
 			var msg='http://v7f.eu/pdok-demo-data/add/' + JSON.stringify(gjf);
 			ajaxRequest.onreadystatechange = null;
 			ajaxRequest.open('GET', msg, true);
 			ajaxRequest.send(null);
+			map.closePopup();
 			}
 		}
 
