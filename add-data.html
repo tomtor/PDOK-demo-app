@@ -37,16 +37,6 @@ https://github.com/tomtor/PDOK-demo-app
 			id: 'brtachtergrondkaart'
 		}).addTo(map);
 
-		var geojsonMarkerOptions = {
-		    radius: 8,
-		    fillColor: "#ff0078",
-		    color: "#000",
-		    weight: 1,
-		    opacity: 1,
-		    fillOpacity: 0.3
-		};
-		var myLayer = L.geoJson().addTo(map);
-
 		// set up AJAX request
 		ajaxRequest=getXmlHttpObject();
 		if (ajaxRequest==null) {
@@ -69,27 +59,42 @@ https://github.com/tomtor/PDOK-demo-app
 		function markersReceived() {
 			if (ajaxRequest.readyState == 4) {
 				if (ajaxRequest.status == 200) {
+					var geojsonMarkerOptions = {
+						radius: 8,
+						fillColor: "#ff0078",
+						color: "#000",
+						weight: 1,
+						opacity: 1,
+						fillOpacity: 0.3
+					};
 					var plotlist= JSON.parse(ajaxRequest.responseText);
 					for (i=0;i<plotlist.length;i++) {
+						pu = "Name: <b>" + plotlist[i].properties.name + "</b>";
 						L.geoJson(plotlist[i], {
 						    pointToLayer: function (feature, latlng) {
-							return L.circleMarker(latlng, geojsonMarkerOptions);
+								return L.circleMarker(latlng, geojsonMarkerOptions);
 						    }
-						}).addTo(map);
-						//myLayer.addData(plotlist[i]);
+						}).addTo(map).bindPopup(pu);
 					}
 				}
 			}
 		}
 
 		function onMapClick(e) {
+			var pu = "Marker at <b>" + e.latlng + "</b><form><br />Name: <input id=\"nameInput\" type=\"text\"/><br/><br/><input id=\"addButton\" type=\"submit\"/></form>";
 			L.marker(e.latlng).addTo(map)
-				.bindPopup("<b>" + e.latlng + "</b><br />Permanent Marker.").openPopup();
+				.bindPopup(pu).openPopup();
+
+			var button = document.getElementById("addButton");
+			button.onclick = function() {
 			var gjf = {
 			    "type": "Feature",
 			    "geometry": {
 				"type": "Point",
 				"coordinates": [ e.latlng.lng , e.latlng.lat ]
+			    },
+			    "properties" : {
+				"name" : document.getElementById("nameInput").value,
 			    }
 			};
 
@@ -97,6 +102,7 @@ https://github.com/tomtor/PDOK-demo-app
 			ajaxRequest.onreadystatechange = null;
 			ajaxRequest.open('GET', msg, true);
 			ajaxRequest.send(null);
+			}
 		}
 
 		map.on('click', onMapClick);
