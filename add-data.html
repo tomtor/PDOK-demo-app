@@ -64,20 +64,27 @@ https://github.com/tomtor/PDOK-demo-app
 				if (ajaxRequest.status == 200) {
 					var geojsonMarkerOptions = {
 						radius: 8,
-						fillColor: "#ff0078",
 						color: "#000",
 						weight: 1,
 						opacity: 1,
-						fillOpacity: 0.3
+						fillOpacity: 0.4
 					};
 					var plotlist= JSON.parse(ajaxRequest.responseText);
 					for (i=0;i<plotlist.length;i++) {
 						pu = "Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
 							"Object type: <b>" + plotlist[i].properties.kind + "</b>";
 						L.geoJson(plotlist[i], {
-						    pointToLayer: function (feature, latlng) {
+							pointToLayer: function (feature, latlng) {
+								if (plotlist[i].properties.kind == "Animal") 
+									geojsonMarkerOptions.fillColor= "#ff0000";
+								else if (plotlist[i].properties.kind == "Tree") 
+									geojsonMarkerOptions.fillColor= "#00ff00";
+								else if (plotlist[i].properties.kind == "Building") 
+									geojsonMarkerOptions.fillColor= "#0000ff";
+								else
+									geojsonMarkerOptions.fillColor= "#ffffff";
 								return L.circleMarker(latlng, geojsonMarkerOptions);
-						    }
+							}
 						}).addTo(map).bindPopup(pu);
 					}
 				}
