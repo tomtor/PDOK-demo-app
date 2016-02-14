@@ -109,25 +109,25 @@ https://github.com/tomtor/PDOK-demo-app
 			var button = document.getElementById("addButton");
 			button.onclick = function() {
 				var gjf = {
-			   	"type": "Feature",
-			   	"geometry": {
-					"type": "Point",
-					"coordinates": [ e.latlng.lng , e.latlng.lat ]
-			   	},
-				"properties" : {
-					"name" : document.getElementById("nameInput").value,
-					"kind" : document.getElementById("selInput").value,
-				}
-			};
+					"type": "Feature",
+					"geometry": {
+						"type": "Point",
+						"coordinates": [ e.latlng.lng , e.latlng.lat ]
+					},
+					"properties" : {
+						"name" : document.getElementById("nameInput").value,
+						"kind" : document.getElementById("selInput").value,
+					}
+				};
 
-			var msg= server + '/add/' + JSON.stringify(gjf);
-			ajaxRequest.onreadystatechange = null;
-			ajaxRequest.open('GET', msg, true);
-			ajaxRequest.send(null);
-			map.closePopup();
-			pu = "Name: <b>" + gjf.properties.name + "</b><br/>" +
-				"Object type: <b>" +  gjf.properties.kind + "</b>";
-			mark.addTo(map).bindPopup(pu);
+				var msg= server + '/add/' + JSON.stringify(gjf);
+				ajaxRequest.onreadystatechange = null;
+				ajaxRequest.open('GET', msg, true);
+				ajaxRequest.send(null);
+				map.closePopup();
+				pu = "Name: <b>" + gjf.properties.name + "</b><br/>" +
+					"Object type: <b>" +  gjf.properties.kind + "</b>";
+				mark.addTo(map).bindPopup(pu);
 			}
 		}
 
