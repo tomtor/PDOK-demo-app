@@ -34,10 +34,11 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("Expect /pdok-demo-data/", "utf-8"))
             return
 
-        r = urllib.request.unquote(self.path)
-        q = r.split('/')
+        qraw = self.path.split('/')
+        q = []
+        for val in qraw :
+            q.append(urllib.request.unquote(val))
         key = q[2]
-        print(self.path)
 
         if q[3] == 'add' :
             c.execute("INSERT INTO markers (uuid, location) VALUES (?,?)", (str(uuid.uuid1()), q[4]) )
