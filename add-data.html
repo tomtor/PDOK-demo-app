@@ -71,7 +71,8 @@ https://github.com/tomtor/PDOK-demo-app
 					};
 					var plotlist= JSON.parse(ajaxRequest.responseText);
 					for (i=0;i<plotlist.length;i++) {
-						pu = "Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
+						pu = "<small>uuid: " + plotlist[i].properties.uuid + "</small><br/><br/>" +
+							"Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
 							"Object type: <b>" + plotlist[i].properties.kind + "</b>";
 						L.geoJson(plotlist[i], {
 							pointToLayer: function (feature, latlng) {
