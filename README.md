@@ -8,4 +8,4 @@ index.html (http://v7f.eu/public/PDOK): Shows a simple Leaflet map, clicking sho
 add-data.html (http://v7f.eu/public/PDOK/add-data.html): Adds permanent data to a map.
 
 
-server.py: Implements the server side storage for add-data.html in a SqlLite database.
+server.py: Implements the server side storage for add-data.html, written in Python3 and stores data in an SqlLite database.
