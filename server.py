@@ -7,6 +7,10 @@ import sys
 
 import sqlite3
 
+import smtplib
+from email.mime.text import MIMEText
+
+
 hostName = "localhost"
 hostPort = 9000
 
@@ -15,9 +19,16 @@ c = conn.cursor()
 
 # Create tables
 c.execute('''CREATE TABLE IF NOT EXISTS requests
-             (path text)''')
-c.execute('''CREATE TABLE IF NOT EXISTS markers
-             (uuid text, location text)''')
+             (path text);''')
+c.execute('''CREATE TABLE IF NOT EXISTS datasets
+             (privateKey text, publicKey text, activated integer);''')
+c.execute('''CREATE TABLE IF NOT EXISTS d_d89d5ee2d34711e59d78bcaec5c2cce2
+             (uuid text, location text);''')
+c.execute('''INSERT INTO datasets (privateKey, publicKey, activated) VALUES('d89d5ee2d34711e59d78bcaec5c2cce2', 'd89d5ee2d34711e59d78bcaec5c2cce2', 1);''')
+conn.commit()
+
+def scrub(table_name):
+    return ''.join( chr for chr in table_name if chr.isalnum() )
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -30,23 +41,28 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("Too long (> 1000)", "utf-8"))
             return
 
-        if self.path[:16] != '/pdok-demo-data/' :
-            self.wfile.write(bytes("Expect /pdok-demo-data/", "utf-8"))
-            return
+        #if self.path[:16] != '/pdok-demo-data/' :
+        #    self.wfile.write(bytes("Expect /pdok-demo-data/", "utf-8"))
+        #    return
 
         qraw = self.path.split('/')
         q = []
         for val in qraw :
             q.append(urllib.request.unquote(val))
-        key = q[2]
+        key = "d_" + scrub(q[2])
 
         if q[3] == 'add' :
-            c.execute("INSERT INTO markers (uuid, location) VALUES (?,?)", (str(uuid.uuid1()), q[4]) )
+            try :
+                c.execute("INSERT INTO " + key + " (uuid, location) VALUES (?,?);", (str(uuid.uuid1()), q[4]) )
+                self.wfile.write(bytes("true", "utf-8"))
+            except :
+                print("add fail: " + self.path)
+                self.wfile.write(bytes("false", "utf-8"))
 
         elif q[3] == 'get' :
             self.wfile.write(bytes('[', "utf-8") )
             first = True
-            for r in c.execute("SELECT uuid, location FROM markers") :
+            for r in c.execute("SELECT uuid, location FROM " + key) :
                 try :
                     js= json.loads(r[1])
                     js["properties"]["uuid"]= r[0]
@@ -60,12 +76,46 @@ class MyServer(BaseHTTPRequestHandler):
                 else :
                     self.wfile.write(bytes(', ' + row, "utf-8") )
             self.wfile.write(bytes(']', "utf-8") )
-            return
 
-        self.wfile.write(bytes("true", "utf-8"))
-        
+        elif q[2] == 'create' :
+            mail = q[3]
+            if '@' not in mail :
+                self.wfile.write(bytes("false", "utf-8"))
+                return
+            publicKey = str(uuid.uuid1())
+            privateKey = str(uuid.uuid4())
+            js= {'private': privateKey, 'public': publicKey }
+            #self.wfile.write(bytes(json.dumps(js), "utf-8"))
+            print(js)
+            # Mail for activation instead of returning it:
+            msg = MIMEText("Private key: " + privateKey
+                + "\nPublic key: " + publicKey
+                + "\n\nActivate: http://v7f.eu/pdok-demo-data/activate/" + privateKey)
+            msg['Subject'] = 'Your data keys and activation link'
+            msg['From'] = 'postmaster@v7f.eu'
+            msg['To'] = mail 
+            s = smtplib.SMTP('localhost')
+            s.send_message(msg)
+            s.quit()
+            c.execute("INSERT INTO datasets (privateKey, publicKey, activated) VALUES(?, ?, 0);", (privateKey, publicKey) )
+            self.wfile.write(bytes("true", "utf-8"))
+
+        elif q[2] == 'activate' :
+            c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
+            data = c.fetchone()
+            if data is None :
+                self.wfile.write(bytes("false", "utf-8"))
+            else :
+                c.execute("UPDATE datasets SET activated = 1 WHERE privateKey = ?;", (q[3], ) )
+                print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, location text);");
+                c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, location text);");
+                self.wfile.write(bytes("true", "utf-8"))
+
+        else :
+            self.wfile.write(bytes("false", "utf-8"))
+
         # Log all requests
-        c.execute("INSERT INTO requests (path) VALUES (?)", (self.path,) )
+        c.execute("INSERT INTO requests (path) VALUES (?);", (self.path,) )
         conn.commit()
 
 
