@@ -31,6 +31,8 @@ def scrub(table_name):
     return ''.join( chr for chr in table_name if chr.isalnum() )
 
 class MyServer(BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        return
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "application/json")
