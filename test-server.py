@@ -20,11 +20,16 @@ print(urllib.request.urlopen(serverKey + "add/"
 print("get:")
 print(urllib.request.urlopen(serverKey + "get/").read())
 
-print("dump:")
-print(urllib.request.urlopen(server + "dump/" + key).read())
+print("delete:")
+print(urllib.request.urlopen(serverKey + "delete/" + "3b5c87b3-9e26-41bd-8bda-4858d23e35f2").read())
+print("delete2:")
+print(urllib.request.urlopen(serverKey + "delete/" + "ddcf5c18-6725-49f2-bce5-897aa41a4262").read())
 
-print("drop:")
-print(urllib.request.urlopen(server + "drop/" + key).read())
+#print("dump:")
+#print(urllib.request.urlopen(server + "dump/" + key).read())
+
+#print("drop:")
+#print(urllib.request.urlopen(server + "drop/" + key).read())
 
 print("dump:")
 print(urllib.request.urlopen(server + "dump/" + key).read())

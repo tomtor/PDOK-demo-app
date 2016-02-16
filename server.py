@@ -67,7 +67,7 @@ class MyServer(BaseHTTPRequestHandler):
         elif q[3] == 'get' :
             self.wfile.write(bytes('[', "utf-8") )
             first = True
-            for r in c.execute("SELECT uuid, location, ip, Timestamp FROM " + key) :
+            for r in c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";") :
                 try :
                     js= json.loads(r[1])
                     js["properties"]["uuid"]= r[0]
@@ -83,6 +83,14 @@ class MyServer(BaseHTTPRequestHandler):
                 else :
                     self.wfile.write(bytes(', ' + row, "utf-8") )
             self.wfile.write(bytes(']', "utf-8") )
+
+        elif q[3] == 'delete' :
+            try :
+                c.execute("DELETE FROM " + key + " WHERE privUuid = ?;", (q[4],) )
+                self.wfile.write(bytes("true", "utf-8"))
+            except:
+                print("Unexpected error:", sys.exc_info()[0])
+                self.wfile.write(bytes("false", "utf-8"))
 
         elif q[2] == 'dump' :
             c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
