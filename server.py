@@ -1,3 +1,5 @@
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import urllib.request
 import time
@@ -23,7 +25,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS datasets
              (privateKey text, publicKey text, activated integer);''')
 c.execute('''CREATE TABLE IF NOT EXISTS d_d89d5ee2d34711e59d78bcaec5c2cce2
              (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);''')
-c.execute('''INSERT INTO datasets (privateKey, publicKey, activated) VALUES('d89d5ee2d34711e59d78bcaec5c2cce2', 'd89d5ee2d34711e59d78bcaec5c2cce2', 1);''')
+c.execute('''INSERT INTO datasets (privateKey, publicKey, activated) VALUES("d89d5ee2-d347-11e5-9d78-bcaec5c2cce2", "d89d5ee2-d347-11e5-9d78-bcaec5c2cce2", 1);''')
 conn.commit()
 
 def scrub(table_name):
@@ -84,6 +86,27 @@ class MyServer(BaseHTTPRequestHandler):
                     self.wfile.write(bytes(', ' + row, "utf-8") )
             self.wfile.write(bytes(']', "utf-8") )
 
+        elif q[2] == 'dump' :
+            c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
+            data = c.fetchone()
+            if data is None :
+                self.wfile.write(bytes("false", "utf-8"))
+            else :
+                try :
+                    self.wfile.write(bytes('[', "utf-8") )
+                    first = True
+                    for r in c.execute("SELECT * FROM d_" + scrub(data[0]) + ";") :
+                        row = json.dumps(r)
+                        if first :
+                            self.wfile.write(bytes(row, "utf-8") )
+                            first = False
+                        else :
+                            self.wfile.write(bytes(', ' + row, "utf-8") )
+                    self.wfile.write(bytes(']', "utf-8") )
+                except :
+                    print("Unexpected error:", sys.exc_info()[0])
+                    self.wfile.write(bytes("false", "utf-8"))
+
         elif q[2] == 'create' :
             mail = q[3]
             if '@' not in mail :
@@ -114,7 +137,7 @@ class MyServer(BaseHTTPRequestHandler):
                 self.wfile.write(bytes("false", "utf-8"))
             else :
                 c.execute("UPDATE datasets SET activated = 1 WHERE privateKey = ?;", (q[3], ) )
-                print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]));
+                print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + ";");
                 c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
                 self.wfile.write(bytes("true", "utf-8"))
 
