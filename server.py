@@ -67,7 +67,14 @@ class MyServer(BaseHTTPRequestHandler):
         elif q[3] == 'get' :
             self.wfile.write(bytes('[', "utf-8") )
             first = True
-            for r in c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";") :
+            where = "1"
+            if len(q) > 4 and len(q[4]) > 0 :
+                print('%' + q[4] + '%')
+                query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + " WHERE location LIKE ?",
+                    ("%" + q[4] + "%", ) )
+            else :
+                query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")
+            for r in query :
                 try :
                     js= json.loads(r[1])
                     js["properties"]["uuid"]= r[0]
