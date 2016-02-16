@@ -66,14 +66,14 @@ class MyServer(BaseHTTPRequestHandler):
 
         elif q[3] == 'get' :
             self.wfile.write(bytes('[', "utf-8") )
-            first = True
-            where = "1"
             if len(q) > 4 and len(q[4]) > 0 :
                 print(q[4])
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + " WHERE location LIKE ?",
                     (q[4], ) )
             else :
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")
+            first = True
+            firstError = True
             for r in query :
                 try :
                     js= json.loads(r[1])
@@ -82,8 +82,10 @@ class MyServer(BaseHTTPRequestHandler):
                     js["properties"]["timestamp"]= r[3]
                     row = json.dumps(js)
                 except :
-                    print("Unexpected error:", sys.exc_info()[0])
-                    row = r[1]
+                    if firstError :
+                        print("Cannot parse JSON")
+                        firstError = False
+                    row = str(r)
                 if first :
                     self.wfile.write(bytes(row, "utf-8") )
                     first = False

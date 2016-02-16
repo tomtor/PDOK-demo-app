@@ -16,6 +16,10 @@ print(urllib.request.urlopen(serverKey + "add/"
 		"coordinates": [6.1884810525762735, 52.678157083226424]},
 		"properties": {"kind": "Animal", "name": "Snake"}}''',
 		safe = '\0')).read())
+print("add no JSON:")
+print(urllib.request.urlopen(serverKey + "add/" + "JustSomeText..."));
+print("add no JSON 2:")
+print(urllib.request.urlopen(serverKey + "add/" + urllib.parse.quote("Some random &*#@^&@%#(*h% data...", '')).read())
 
 print("get:")
 print(urllib.request.urlopen(serverKey + "get/" ).read())
