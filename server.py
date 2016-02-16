@@ -55,10 +55,10 @@ class MyServer(BaseHTTPRequestHandler):
         if q[3] == 'add' :
             try :
                 #print(self.client_address)
-                print(self.headers['Host'])
+                #print(self.headers)
                 privUuid = str(uuid.uuid4())
                 c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
-                    (str(uuid.uuid1()), privUuid, self.headers['Host'], q[4]) )
+                    (str(uuid.uuid1()), privUuid, self.headers['X-Forwarded-For'], q[4]) )
                 self.wfile.write(bytes(privUuid, "utf-8"))
             except:
                 print("add fail: " + self.path)
