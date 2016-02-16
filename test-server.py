@@ -18,9 +18,9 @@ print(urllib.request.urlopen(serverKey + "add/"
 		safe = '\0')).read())
 
 print("get:")
-print(urllib.request.urlopen(serverKey + "get/").read())
+print(urllib.request.urlopen(serverKey + "get/" ).read())
 print("get:")
-print(urllib.request.urlopen(serverKey + "get/" + "53").read())
+print(urllib.request.urlopen(serverKey + "get/" + urllib.parse.quote("%nak%", '')).read())
 
 print("delete:")
 print(urllib.request.urlopen(serverKey + "delete/" + "3b5c87b3-9e26-41bd-8bda-4858d23e35f2").read())

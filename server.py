@@ -69,9 +69,9 @@ class MyServer(BaseHTTPRequestHandler):
             first = True
             where = "1"
             if len(q) > 4 and len(q[4]) > 0 :
-                print('%' + q[4] + '%')
+                print(q[4])
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + " WHERE location LIKE ?",
-                    ("%" + q[4] + "%", ) )
+                    (q[4], ) )
             else :
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")
             for r in query :
