@@ -71,7 +71,7 @@ class MyServer(BaseHTTPRequestHandler):
                 try :
                     js= json.loads(r[1])
                     js["properties"]["uuid"]= r[0]
-                    js["properties"]["ip_port"]= r[2]
+                    js["properties"]["ip_info"]= r[2]
                     js["properties"]["timestamp"]= r[3]
                     row = json.dumps(js)
                 except :
