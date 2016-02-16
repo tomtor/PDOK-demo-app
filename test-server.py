@@ -20,20 +20,20 @@ print(urllib.request.urlopen(serverKey + "add/"
 print("get:")
 print(urllib.request.urlopen(serverKey + "get/").read())
 
-print("create:")
-print(urllib.request.urlopen(server + "create/postmaster@v7f.eu").read())
-
-print("activate:")
-print(urllib.request.urlopen(server + "activate/1c6e093d-6df6-4e63-b19b-b3be8fb8d606").read())
-print("activate2:")
-print(urllib.request.urlopen(server + "activate/85c6e606-9701-44ea-b9d5-8c9c2f7ed428").read())
-
-print("add2:")
-print(urllib.request.urlopen(server + "c6f3800f-d423-11e5-9d78-bcaec5c2cce2" + "/add/"
-	+ urllib.parse.quote('''
-		{"type": "Feature", "geometry": {"type": "Point",
-		"coordinates": [6.1884810525762735, 52.678157083226424]},
-		"properties": {"kind": "Animal", "name": "Snake"}}''',
-		safe = '\0')).read())
-print("get2:")
-print(urllib.request.urlopen(server + "c6f3800f-d423-11e5-9d78-bcaec5c2cce2" + "/get/").read())
+#print("create:")
+#print(urllib.request.urlopen(server + "create/postmaster@v7f.eu").read())
+#
+#print("activate:")
+#print(urllib.request.urlopen(server + "activate/1c6e093d-6df6-4e63-b19b-b3be8fb8d606").read())
+#print("activate2:")
+#print(urllib.request.urlopen(server + "activate/85c6e606-9701-44ea-b9d5-8c9c2f7ed428").read())
+#
+#print("add2:")
+#print(urllib.request.urlopen(server + "c6f3800f-d423-11e5-9d78-bcaec5c2cce2" + "/add/"
+#	+ urllib.parse.quote('''
+#		{"type": "Feature", "geometry": {"type": "Point",
+#		"coordinates": [6.1884810525762735, 52.678157083226424]},
+#		"properties": {"kind": "Animal", "name": "Snake"}}''',
+#		safe = '\0')).read())
+#print("get2:")
+#print(urllib.request.urlopen(server + "c6f3800f-d423-11e5-9d78-bcaec5c2cce2" + "/get/").read())

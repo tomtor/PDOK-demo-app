@@ -10,7 +10,6 @@ import sqlite3
 import smtplib
 from email.mime.text import MIMEText
 
-
 hostName = "localhost"
 hostPort = 9000
 
@@ -23,7 +22,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS requests
 c.execute('''CREATE TABLE IF NOT EXISTS datasets
              (privateKey text, publicKey text, activated integer);''')
 c.execute('''CREATE TABLE IF NOT EXISTS d_d89d5ee2d34711e59d78bcaec5c2cce2
-             (uuid text, location text);''')
+             (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);''')
 c.execute('''INSERT INTO datasets (privateKey, publicKey, activated) VALUES('d89d5ee2d34711e59d78bcaec5c2cce2', 'd89d5ee2d34711e59d78bcaec5c2cce2', 1);''')
 conn.commit()
 
@@ -55,19 +54,24 @@ class MyServer(BaseHTTPRequestHandler):
 
         if q[3] == 'add' :
             try :
-                c.execute("INSERT INTO " + key + " (uuid, location) VALUES (?,?);", (str(uuid.uuid1()), q[4]) )
-                self.wfile.write(bytes("true", "utf-8"))
-            except :
+                print(self.client_address)
+                privUuid = str(uuid.uuid4())
+                c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
+                    (str(uuid.uuid1()), privUuid, str(self.client_address), q[4]) )
+                self.wfile.write(bytes(privUuid, "utf-8"))
+            except:
                 print("add fail: " + self.path)
                 self.wfile.write(bytes("false", "utf-8"))
 
         elif q[3] == 'get' :
             self.wfile.write(bytes('[', "utf-8") )
             first = True
-            for r in c.execute("SELECT uuid, location FROM " + key) :
+            for r in c.execute("SELECT uuid, location, ip, Timestamp FROM " + key) :
                 try :
                     js= json.loads(r[1])
                     js["properties"]["uuid"]= r[0]
+                    js["properties"]["ip_port"]= r[2]
+                    js["properties"]["timestamp"]= r[3]
                     row = json.dumps(js)
                 except :
                     print("Unexpected error:", sys.exc_info()[0])
@@ -109,8 +113,8 @@ class MyServer(BaseHTTPRequestHandler):
                 self.wfile.write(bytes("false", "utf-8"))
             else :
                 c.execute("UPDATE datasets SET activated = 1 WHERE privateKey = ?;", (q[3], ) )
-                print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, location text);");
-                c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, location text);");
+                print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]));
+                c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
                 self.wfile.write(bytes("true", "utf-8"))
 
         else :
