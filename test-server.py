@@ -23,6 +23,12 @@ print(urllib.request.urlopen(serverKey + "get/").read())
 print("dump:")
 print(urllib.request.urlopen(server + "dump/" + key).read())
 
+print("drop:")
+print(urllib.request.urlopen(server + "drop/" + key).read())
+
+print("dump:")
+print(urllib.request.urlopen(server + "dump/" + key).read())
+
 #print("create:")
 #print(urllib.request.urlopen(server + "create/postmaster@v7f.eu").read())
 #

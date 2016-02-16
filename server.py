@@ -56,8 +56,6 @@ class MyServer(BaseHTTPRequestHandler):
 
         if q[3] == 'add' :
             try :
-                #print(self.client_address)
-                #print(self.headers)
                 privUuid = str(uuid.uuid4())
                 c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
                     (str(uuid.uuid1()), privUuid, self.headers['X-Forwarded-For'], q[4]) )
@@ -103,6 +101,26 @@ class MyServer(BaseHTTPRequestHandler):
                         else :
                             self.wfile.write(bytes(', ' + row, "utf-8") )
                     self.wfile.write(bytes(']', "utf-8") )
+                except :
+                    print("Unexpected error:", sys.exc_info()[0])
+                    self.wfile.write(bytes("false", "utf-8"))
+
+        elif q[2] == 'drop' :
+            c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
+            data = c.fetchone()
+            if data is None :
+                self.wfile.write(bytes("false", "utf-8"))
+            else :
+                try :
+                    c.execute("SELECT count(*) FROM d_" + scrub(data[0]) + ";")
+                    cdata = c.fetchone()
+                    if cdata[0] == 0 :
+                        c.execute("DROP TABLE d_" + scrub(data[0]) + ";")
+                        c.execute("DELETE FROM datasets WHERE privateKey = ?", (q[3],) )
+                        self.wfile.write(bytes("true", "utf-8"))
+                    else :
+                        print("not empty")
+                        self.wfile.write(bytes("false", "utf-8"))
                 except :
                     print("Unexpected error:", sys.exc_info()[0])
                     self.wfile.write(bytes("false", "utf-8"))
