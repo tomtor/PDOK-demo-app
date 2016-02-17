@@ -55,10 +55,15 @@ class MyServer(BaseHTTPRequestHandler):
 
         if q[3] == 'add' :
             try :
-                privUuid = str(uuid.uuid4())
-                c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
-                    (str(uuid.uuid1()), privUuid, self.headers['X-Forwarded-For'], q[4]) )
-                self.wfile.write(bytes(privUuid, "utf-8"))
+                c.execute("SELECT activated FROM datasets WHERE publicKey = ?", (q[2],) )
+                data = c.fetchone()
+                if data[0] == 0 :
+                    privUuid = str(uuid.uuid4())
+                    c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
+                        (str(uuid.uuid1()), privUuid, self.headers['X-Forwarded-For'], q[4]) )
+                    self.wfile.write(bytes(privUuid, "utf-8"))
+                else :
+                    self.wfile.write(bytes("readonly", "utf-8"))
             except:
                 print("add fail: " + self.path)
                 self.wfile.write(bytes("false", "utf-8"))
@@ -175,6 +180,10 @@ class MyServer(BaseHTTPRequestHandler):
                 print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + ";");
                 c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
                 self.wfile.write(bytes('<html><body>Welcome...<br/><br/><a href="https://github.com/tomtor/PDOK-demo-app">Documentation</a></body></html>', "utf-8"))
+
+        elif q[2] == 'readonly' :
+                c.execute("UPDATE datasets SET activated = ? WHERE privateKey = ?;", (int(q[4]), q[3]) )
+                self.wfile.write(bytes("true", "utf-8"))
 
         else :
             self.wfile.write(bytes("false", "utf-8"))
