@@ -35,8 +35,12 @@ class MyServer(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
     def do_GET(self):
+        qraw = self.path.split('/')
         self.send_response(200)
-        self.send_header("Content-type", "application/json")
+        if qraw[2] == 'activate' :
+            self.send_header("Content-type", "text/html")
+        else :
+            self.send_header("Content-type", "application/json")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         
@@ -44,11 +48,6 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("Too long (> 1000)", "utf-8"))
             return
 
-        #if self.path[:16] != '/pdok-demo-data/' :
-        #    self.wfile.write(bytes("Expect /pdok-demo-data/", "utf-8"))
-        #    return
-
-        qraw = self.path.split('/')
         q = []
         for val in qraw :
             q.append(urllib.request.unquote(val))
@@ -153,7 +152,7 @@ class MyServer(BaseHTTPRequestHandler):
             js= {'private': privateKey, 'public': publicKey }
             #self.wfile.write(bytes(json.dumps(js), "utf-8"))
             print(js)
-            # Mail for activation instead of returning it:
+            # Mail for activation instead of directly returning it:
             msg = MIMEText("Private key: " + privateKey
                 + "\nPublic key: " + publicKey
                 + "\n\nActivate: http://v7f.eu/pdok-demo-data/activate/" + privateKey)
@@ -175,7 +174,7 @@ class MyServer(BaseHTTPRequestHandler):
                 c.execute("UPDATE datasets SET activated = 1 WHERE privateKey = ?;", (q[3], ) )
                 print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + ";");
                 c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
-                self.wfile.write(bytes("true", "utf-8"))
+                self.wfile.write(bytes('<html><body>Welcome...<br/><br/><a href="https://github.com/tomtor/PDOK-demo-app">Documentation</a></body></html>', "utf-8"))
 
         else :
             self.wfile.write(bytes("false", "utf-8"))
