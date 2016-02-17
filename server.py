@@ -31,6 +31,9 @@ conn.commit()
 def scrub(table_name):
     return ''.join( chr for chr in table_name if chr.isalnum() )
 
+def scrubMail(mail_name):
+    return ''.join( chr for chr in mail_name if (chr.isalnum() or chr == '.' or chr == '@' or chr == '_' or chr == '-') )
+
 class MyServer(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
@@ -163,7 +166,7 @@ class MyServer(BaseHTTPRequestHandler):
                 + "\n\nActivate: http://v7f.eu/pdok-demo-data/activate/" + privateKey)
             msg['Subject'] = 'Your data keys and activation link'
             msg['From'] = 'postmaster@v7f.eu'
-            msg['To'] = mail 
+            msg['To'] = scrubMail(mail)
             s = smtplib.SMTP('localhost')
             s.send_message(msg)
             s.quit()
