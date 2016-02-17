@@ -68,7 +68,8 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes('[', "utf-8") )
             if len(q) > 4 and len(q[4]) > 0 :
                 print(q[4])
-                query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + " WHERE location LIKE ?",
+                query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key
+                    + " WHERE (Timestamp || uuid || COALESCE(ip,'') || location) LIKE ?",
                     (q[4], ) )
             else :
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")

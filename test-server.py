@@ -23,7 +23,7 @@ print(urllib.request.urlopen(serverKey + "add/" + urllib.parse.quote("Some rando
 
 print("get:")
 print(urllib.request.urlopen(serverKey + "get/" ).read())
-print("get:")
+print("get: %nak%")
 print(urllib.request.urlopen(serverKey + "get/" + urllib.parse.quote("%nak%", '')).read())
 
 print("delete:")
