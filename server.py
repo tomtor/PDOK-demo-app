@@ -57,7 +57,7 @@ class MyServer(BaseHTTPRequestHandler):
             try :
                 c.execute("SELECT activated FROM datasets WHERE publicKey = ?", (q[2],) )
                 data = c.fetchone()
-                if data[0] == 0 :
+                if data[0] == 1 :
                     privUuid = str(uuid.uuid4())
                     c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
                         (str(uuid.uuid1()), privUuid, self.headers['X-Forwarded-For'], q[4]) )
@@ -182,7 +182,7 @@ class MyServer(BaseHTTPRequestHandler):
                 self.wfile.write(bytes('<html><body>Welcome...<br/><br/><a href="https://github.com/tomtor/PDOK-demo-app">Documentation</a></body></html>', "utf-8"))
 
         elif q[2] == 'readonly' :
-                c.execute("UPDATE datasets SET activated = ? WHERE privateKey = ?;", (int(q[4]), q[3]) )
+                c.execute("UPDATE datasets SET activated = ? WHERE privateKey = ?;", (1-int(q[4]), q[3]) )
                 self.wfile.write(bytes("true", "utf-8"))
 
         else :
