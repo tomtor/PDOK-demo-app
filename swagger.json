@@ -167,8 +167,8 @@
                     {
                         "name": "like",
                         "in": "path",
-                        "description": "An optional SQL LIKE filter string",
-                        "required": false,
+                        "description": "An optional SQL LIKE filter string. Leaving it empty defaults to '%' (All), but swagger cannot specify optional path elements.",
+                        "required": true,
                         "type": "string"
                     }
                 ],
