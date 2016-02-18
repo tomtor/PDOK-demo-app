@@ -1,6 +1,10 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
+
+import threading
+
 import urllib.request
 import time
 import sys
@@ -13,6 +17,9 @@ from create import create_db
 hostName = "localhost"
 hostPort = 9000
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+
 create_db()
 
 class MyServer(BaseHTTPRequestHandler):
@@ -22,7 +29,7 @@ class MyServer(BaseHTTPRequestHandler):
         return do_GET(self)
 
 
-myServer = HTTPServer((hostName, hostPort), MyServer)
+myServer = ThreadedHTTPServer((hostName, hostPort), MyServer)
 print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
 
 try:
