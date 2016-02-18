@@ -49,7 +49,7 @@ def do_GET(req):
                 privUuid = str(uuid.uuid4())
                 c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
                     (str(uuid.uuid1()), privUuid, req.headers['X-Forwarded-For'], q[4]) )
-                req.wfile.write(bytes(privUuid, "utf-8"))
+                req.wfile.write(bytes('"'+privUuid+'"', "utf-8"))
             else:
                 req.wfile.write(bytes("readonly", "utf-8"))
         except:

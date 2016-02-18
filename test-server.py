@@ -36,8 +36,8 @@ print(urllib.request.urlopen(serverKey + "add/" + "JustSomeText...").read());
 print("add no JSON 2:")
 print(urllib.request.urlopen(serverKey + "add/" + urllib.parse.quote("Some random &*#@^&@%#(*h% data...", '')).read())
 
-print("get:")
-print(urllib.request.urlopen(serverKey + "get/" ).read())
+#print("get:")
+#print(urllib.request.urlopen(serverKey + "get/" ).read())
 #print("get: %nak%")
 #print(urllib.request.urlopen(serverKey + "get/" + urllib.parse.quote("%nak%", '')).read())
 
