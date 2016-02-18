@@ -10,11 +10,10 @@ import sqlite3
 from logic import do_GET
 from create import create_db
 
-create_db()
-
 hostName = "localhost"
 hostPort = 9000
 
+create_db()
 
 class MyServer(BaseHTTPRequestHandler):
     def log_message(self, format, *args):

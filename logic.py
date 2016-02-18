@@ -12,8 +12,6 @@ import sqlite3
 import smtplib
 from email.mime.text import MIMEText
 
-hostName = "localhost"
-hostPort = 9000
 
 def scrub(table_name):
     return ''.join( chr for chr in table_name if chr.isalnum() )
