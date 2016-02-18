@@ -2,7 +2,8 @@
     "swagger": "2.0",
     "info": {
         "version": "0.0.1",
-        "title": "SimpleGeoStore"
+        "title": "SimpleGeoStore",
+	"description": "Implements a Self Service (JSON) data store for small datasets"
     },
     "host": "v7f.eu",
     "basePath": "/pdok-demo-data",
