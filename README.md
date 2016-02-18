@@ -41,9 +41,9 @@ Note that it must be empty before it can be dropped!
 
 Dumps all the data in the database with the private UUID key including the private UUID object keys.
 
-### ../readonly/UUID/(0|1)
+### ../readonly/UUID/{0|1}
 
-Makes the database with the private UUID key readonly (1) or read/write (1).
+Makes the database with the private UUID key readonly (1) or read/write (0).
 
 
 ## Public API calls
