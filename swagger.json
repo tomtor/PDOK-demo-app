@@ -168,7 +168,7 @@
                         "name": "like",
                         "in": "path",
                         "description": "An optional SQL LIKE filter string",
-                        "required": true,
+                        "required": false,
                         "type": "string"
                     }
                 ],
