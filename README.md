@@ -12,6 +12,7 @@ A collection of PDOK (http://www.pdok.nl) example applications
   * Written in Python3
   * Stores the added data in an SQLite database.
   * Private/public access keys with mail activation
+  * With Swagger API documentation: http://v7f.eu/public/PDOK/dist
 
 * test-server.py
   * Test script which demonstrates the API
