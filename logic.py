@@ -78,7 +78,7 @@ def do_GET(req):
                 if firstError:
                     print("Cannot parse JSON")
                     firstError = False
-                row = str(r)
+                row = '"'+str(r)+'"'
             if first:
                 req.wfile.write(bytes(row, "utf-8") )
                 first = False
