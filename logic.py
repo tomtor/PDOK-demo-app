@@ -57,34 +57,37 @@ def do_GET(req):
             req.wfile.write(bytes("false", "utf-8"))
 
     elif q[3] == 'get':
-        req.wfile.write(bytes('[', "utf-8") )
-        if len(q) > 4 and len(q[4]) > 0:
-            print(q[4])
-            query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key
-                + " WHERE (Timestamp || uuid || COALESCE(ip,'') || location) LIKE ?",
-                (q[4], ) )
-        else:
-            query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")
-        first = True
-        firstError = True
-        for r in query:
-            try:
-                js= json.loads(r[1])
-                js["properties"]["uuid"]= r[0]
-                js["properties"]["ip_info"]= r[2]
-                js["properties"]["timestamp"]= r[3]
-                row = json.dumps(js)
-            except:
-                if firstError:
-                    print("Cannot parse JSON")
-                    firstError = False
-                row = '"'+str(r)+'"'
-            if first:
-                req.wfile.write(bytes(row, "utf-8") )
-                first = False
+        try:
+            req.wfile.write(bytes('[', "utf-8") )
+            if len(q) > 4 and len(q[4]) > 0:
+                print(q[4])
+                query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key
+                    + " WHERE (Timestamp || uuid || COALESCE(ip,'') || location) LIKE ?",
+                    (q[4], ) )
             else:
-                req.wfile.write(bytes(', ' + row, "utf-8") )
-        req.wfile.write(bytes(']', "utf-8") )
+                query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")
+            first = True
+            firstError = True
+            for r in query:
+                try:
+                    js= json.loads(r[1])
+                    js["properties"]["uuid"]= r[0]
+                    js["properties"]["ip_info"]= r[2]
+                    js["properties"]["timestamp"]= r[3]
+                    row = json.dumps(js)
+                except:
+                    if firstError:
+                        print("Cannot parse JSON")
+                        firstError = False
+                    row = '"'+str(r)+'"'
+                if first:
+                    req.wfile.write(bytes(row, "utf-8") )
+                    first = False
+                else:
+                    req.wfile.write(bytes(', ' + row, "utf-8") )
+            req.wfile.write(bytes(']', "utf-8") )
+        except:
+            req.wfile.write(bytes("false", "utf-8"))
 
     elif q[3] == 'delete':
         try:
