@@ -179,3 +179,4 @@ def do_GET(req):
     # Log all requests
     c.execute("INSERT INTO requests (path) VALUES (?);", (req.path,) )
     conn.commit()
+    conn.close()
