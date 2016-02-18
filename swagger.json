@@ -32,7 +32,7 @@
         },
         "/activate/{privUUID}": {
             "get": {
-                "description": "Activate the database with the specified private UUID.\n",
+                "description": "Activate the database with the specified private UUID.",
                 "parameters": [
                     {
                         "name": "privUUID",
@@ -54,7 +54,7 @@
         },
         "/drop/{privUUID}": {
             "get": {
-                "description": "Drop (destroy) the database with the specified private UUID.\n",
+                "description": "Drop (destroy) the database with the specified private UUID.",
                 "parameters": [
                     {
                         "name": "privUUID",
@@ -76,7 +76,7 @@
         },
         "/dump/{privUUID}": {
             "get": {
-                "description": "Dumps all the data in the database with the private UUID key including the private UUID object keys.\n",
+                "description": "Dumps all the data in the database with the private UUID key including the private UUID object keys. Attribute order in the dump: uuid, privUuid, ip, Timestamp, data.",
                 "parameters": [
                     {
                         "name": "privUUID",
