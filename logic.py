@@ -27,7 +27,7 @@ def do_GET(req):
 
     qraw = req.path.split('/')
 
-    if len(qraw) < 3:
+    if len(qraw) < 4:
         req.send_response(400)
         req.wfile.write(bytes("Too few args", "utf-8"))
         return
