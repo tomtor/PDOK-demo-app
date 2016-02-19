@@ -21,15 +21,13 @@ def scrubMail(mail_name):
 
 def do_GET(req):
     if len(req.path) > 1000:
-        req.send_response(400)
-        req.wfile.write(bytes("Too long (> 1000)", "utf-8"))
+        req.send_error(400, "Too long (> 1000)", "utf-8")
         return
 
     qraw = req.path.split('/')
 
     if len(qraw) < 4:
-        req.send_response(400)
-        req.wfile.write(bytes("Too few args", "utf-8"))
+        req.send_error(400, "Too few args", "utf-8")
         return
 
     req.send_response(200)

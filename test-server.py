@@ -9,6 +9,8 @@ key	 = "d89d5ee2-d347-11e5-9d78-bcaec5c2cce2";
 server = "http://" + hostName + ":" + hostPort + "/test/"
 serverKey = server + key + "/"
 
+print("short")
+print(urllib.request.urlopen(server + "short").read())
 print("readonly: 0")
 print(urllib.request.urlopen(server + "readonly/" + key + "/0").read())
 print("add:")
