@@ -20,16 +20,16 @@ def scrubMail(mail_name):
     return ''.join( chr for chr in mail_name if (chr.isalnum() or chr == '.' or chr == '@' or chr == '_' or chr == '-') )
 
 def do_GET(req):
+    if len(req.path) > 1000:
+        req.send_response(400)
+        req.wfile.write(bytes("Too long (> 1000)", "utf-8"))
+        return
+
     qraw = req.path.split('/')
 
     if len(qraw) < 3:
         req.send_response(400)
         req.wfile.write(bytes("Too few args", "utf-8"))
-        return
-
-    if len(req.path) > 1000:
-        req.send_response(400)
-        req.wfile.write(bytes("Too long (> 1000)", "utf-8"))
         return
 
     req.send_response(200)
