@@ -85,15 +85,19 @@ def do_GET(req, pc):
             for r in query:
                 try:
                     js= json.loads(r[1])
-                    js["properties"]["uuid"]= r[0]
-                    js["properties"]["ip_info"]= r[2]
-                    js["properties"]["timestamp"]= r[3]
-                    row = json.dumps(js)
+                    if not "properties" in js:
+                        js["properties"]={}
                 except:
                     if firstError:
                         print("Cannot parse JSON")
                         firstError = False
-                    row = '"'+str(r)+'"'
+                    js={}
+                    js["properties"]={}
+                    js["data"]= r[1]
+                js["properties"]["uuid"]= r[0]
+                js["properties"]["ip_info"]= r[2]
+                js["properties"]["timestamp"]= r[3]
+                row = json.dumps(js)
                 if first:
                     req.wfile.write(bytes(row, "utf-8") )
                     first = False
@@ -101,7 +105,7 @@ def do_GET(req, pc):
                     req.wfile.write(bytes(', ' + row, "utf-8") )
             req.wfile.write(bytes(']', "utf-8") )
         except Exception as e:
-            #print(str(e))
+            print(str(e))
             print("get fail: " + req.path)
             req.wfile.write(bytes("false", "utf-8"))
 

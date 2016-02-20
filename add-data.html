@@ -9,6 +9,7 @@ https://github.com/tomtor/PDOK-demo-app
 <title>PDOK Leaflet Example</title>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <!--
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 -->
@@ -43,61 +44,42 @@ https://github.com/tomtor/PDOK-demo-app
 		id: 'brtachtergrondkaart'
 	}).addTo(map);
 
-	// set up AJAX request
-	ajaxRequest=getXmlHttpObject();
-	if (ajaxRequest==null) {
-		alert ("This browser does not support HTTP Request");
-	}
-
-	function getXmlHttpObject() {
-		if (window.XMLHttpRequest) { return new XMLHttpRequest(); }
-		if (window.ActiveXObject)  { return new ActiveXObject("Microsoft.XMLHTTP"); }
-		return null;
-	}
-
 	var popup = L.popup();
 
-	var msg= server + '/get/';
-	ajaxRequest.onreadystatechange = markersReceived;
-	ajaxRequest.open('GET', msg, true);
-	ajaxRequest.send(null);
+	$.ajax({url: server+"/get/", success: function(result){ markersReceived(result) }});
 
-	function markersReceived() {
-		if (ajaxRequest.readyState == 4) {
-			if (ajaxRequest.status == 200) {
-				var geojsonMarkerOptions = {
-					radius: 8,
-					color: "#000",
-					weight: 1,
-					opacity: 1,
-					fillOpacity: 0.4
-				};
-				var plotlist= JSON.parse(ajaxRequest.responseText);
-				for (i=0;i<plotlist.length;i++) {
-					try {
-						pu = "<small>uuid: " + plotlist[i].properties.uuid + "<br/>" +
-							"timestamp: " + plotlist[i].properties.timestamp + "<br/>" +
-							"IP info: " + plotlist[i].properties.ip_info + "<br/>" +
-							"</small><br/>" +
-							"Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
-							"Object type: <b>" + plotlist[i].properties.kind + "</b>";
-						L.geoJson(plotlist[i], {
-							pointToLayer: function (feature, latlng) {
-								if (plotlist[i].properties.kind == "Animal") 
-									geojsonMarkerOptions.fillColor= "#ff0000";
-								else if (plotlist[i].properties.kind == "Tree") 
-									geojsonMarkerOptions.fillColor= "#00ff00";
-								else if (plotlist[i].properties.kind == "Building") 
-									geojsonMarkerOptions.fillColor= "#0000ff";
-								else
-									geojsonMarkerOptions.fillColor= "#ffffff";
-								return L.circleMarker(latlng, geojsonMarkerOptions);
-							}
-						}).addTo(map).bindPopup(pu);
+	function markersReceived(result) {
+		var geojsonMarkerOptions = {
+			radius: 8,
+			color: "#000",
+			weight: 1,
+			opacity: 1,
+			fillOpacity: 0.4
+		};
+		var plotlist= result;
+		for (i= 0; i < plotlist.length; i++) {
+			try {
+				pu = "<small>uuid: " + plotlist[i].properties.uuid + "<br/>" +
+					"timestamp: " + plotlist[i].properties.timestamp + "<br/>" +
+					"IP info: " + plotlist[i].properties.ip_info + "<br/>" +
+					"</small><br/>" +
+					"Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
+					"Object type: <b>" + plotlist[i].properties.kind + "</b>";
+				L.geoJson(plotlist[i], {
+					pointToLayer: function (feature, latlng) {
+						if (plotlist[i].properties.kind == "Animal") 
+							geojsonMarkerOptions.fillColor= "#ff0000";
+						else if (plotlist[i].properties.kind == "Tree") 
+							geojsonMarkerOptions.fillColor= "#00ff00";
+						else if (plotlist[i].properties.kind == "Building") 
+							geojsonMarkerOptions.fillColor= "#0000ff";
+						else
+							geojsonMarkerOptions.fillColor= "#ffffff";
+						return L.circleMarker(latlng, geojsonMarkerOptions);
 					}
-					catch (err) {
-					}
-				}
+				}).addTo(map).bindPopup(pu);
+			}
+			catch (err) {
 			}
 		}
 	}
@@ -129,9 +111,7 @@ https://github.com/tomtor/PDOK-demo-app
 			};
 
 			var msg= server + '/add/' + JSON.stringify(gjf);
-			ajaxRequest.onreadystatechange = null;
-			ajaxRequest.open('GET', msg, true);
-			ajaxRequest.send(null);
+			$.ajax({url: msg, success: function(result){ }});
 			map.closePopup();
 			pu = "Name: <b>" + gjf.properties.name + "</b><br/>" +
 				"Object type: <b>" +  gjf.properties.kind + "</b>";
