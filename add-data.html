@@ -16,7 +16,7 @@ https://github.com/tomtor/PDOK-demo-app
 <link rel="stylesheet" href="leaflet.css" />
 </head>
 <body>
-<div id="map" style="width: 800px; height: 750px"></div>
+<div id="map" style="width: 100%; height: 750px"></div>
 <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 <script src="http://rawgithub.com/kartena/Proj4Leaflet/master/lib/proj4-compressed.js"></script>
 <script src="http://v7f.eu/public/PDOK/proj4leaflet.js"></script>
@@ -123,9 +123,9 @@ https://github.com/tomtor/PDOK-demo-app
 				var pu = "<small>Secret Key: " + result + "</small><br/>Name: <b>" + gjf.properties.name + "</b><br/>" +
 				"Object type: <b>" +  gjf.properties.kind + "</b>" +
 				"<br/><br/><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/>";
-				//mark.key= result;
 				markers[result]= mark;
 				mark.addTo(map).bindPopup(pu);
+				$("#keyTable").append("<tr id='"+result+"'><td>"+result+"</td></tr>");
 			}})
 		});
 	}
@@ -133,12 +133,21 @@ https://github.com/tomtor/PDOK-demo-app
 	map.on('click', onMapClick);
 
 </script>
+<br/>
+<small>
+<div style="height: 70px; border: 1px solid blue; overflow: auto;">
+<table id="keyTable">
+<b>Added Objects</b>, save these keys if you want to delete them later...
+</table>
+</div>
+</small>
 
 <p>This demo shows how to add data to a Leaflet map layer.</p>
 
-<p>On each mouse click a new object is added to the map and made visible for every visitor.</p>
+<p>On each mouse click a new object is added to the map and made visible for every visitor.<br/>
+You can delete them in the same session as long as you don't refresh the page.</p>
 
-<p>The data is stored in an SqlLite server database, it is 
+<p>The data is stored in an SqlLite or PostgreSQL server database, it is 
 cleared every day...</p>
 <hr/>
 <h2>Create your own database by entering your eMail:</h2>
