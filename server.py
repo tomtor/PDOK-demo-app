@@ -10,6 +10,7 @@ import time
 import sys
 
 import sqlite3
+import psycopg2
 
 from logic import do_GET
 from create import create_db
@@ -17,16 +18,19 @@ from create import create_db
 hostName = "localhost"
 hostPort = 9000
 
+#pgConn = None
+pgConn = psycopg2.connect("dbname='simplestore' user='simple' host='swan.v7f.eu' password='simple'")
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
 
-create_db()
+create_db(pgConn)
 
 class MyServer(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
     def do_GET(self):
-        return do_GET(self)
+        return do_GET(self, pgConn)
 
 
 myServer = ThreadedHTTPServer((hostName, hostPort), MyServer)

@@ -12,6 +12,10 @@ import sqlite3
 import smtplib
 from email.mime.text import MIMEText
 
+def p(db):
+    return '?' if db is None else '%s'
+def p4(db):
+    return '?,?,?,?' if db is None else '%s,%s,%s,%s'
 
 def scrub(table_name):
     return ''.join( chr for chr in table_name if chr.isalnum() )
@@ -19,7 +23,7 @@ def scrub(table_name):
 def scrubMail(mail_name):
     return ''.join( chr for chr in mail_name if (chr.isalnum() or chr == '.' or chr == '@' or chr == '_' or chr == '-') )
 
-def do_GET(req):
+def do_GET(req, pc):
     if len(req.path) > 1000:
         req.send_error(400, "Too long (> 1000)", "utf-8")
         return
@@ -38,7 +42,10 @@ def do_GET(req):
     req.send_header("Access-Control-Allow-Origin", "*")
     req.end_headers()
     
-    conn = sqlite3.connect('request.db')
+    if pc is None:
+        conn = sqlite3.connect('request.db')
+    else:
+        conn = pc
     c = conn.cursor()
 
     q = []
@@ -48,11 +55,11 @@ def do_GET(req):
 
     if q[3] == 'add':
         try:
-            c.execute("SELECT activated FROM datasets WHERE publicKey = ?", (q[2],) )
+            c.execute("SELECT activated FROM datasets WHERE publicKey = " + p(pc)+";", (q[2],) )
             data = c.fetchone()
             if data[0] == 1:
                 privUuid = str(uuid.uuid4())
-                c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (?,?,?,?);",
+                c.execute("INSERT INTO " + key + " (uuid, privUuid, ip, location) VALUES (" + p4(pc) + ");",
                     (str(uuid.uuid1()), privUuid, req.headers['X-Forwarded-For'], q[4]) )
                 req.wfile.write(bytes('"'+privUuid+'"', "utf-8"))
             else:
@@ -63,16 +70,18 @@ def do_GET(req):
 
     elif q[3] == 'get':
         try:
-            req.wfile.write(bytes('[', "utf-8") )
             if len(q) > 4 and len(q[4]) > 0:
                 print(q[4])
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key
-                    + " WHERE (Timestamp || uuid || COALESCE(ip,'') || location) LIKE ?",
+                    + " WHERE (Timestamp || uuid || COALESCE(ip,'') || location) LIKE "+p(pc)+";",
                     (q[4], ) )
             else:
                 query = c.execute("SELECT uuid, location, ip, Timestamp FROM " + key + ";")
             first = True
             firstError = True
+            req.wfile.write(bytes('[', "utf-8") )
+            if not pc is None:
+                query= c.fetchall()
             for r in query:
                 try:
                     js= json.loads(r[1])
@@ -91,13 +100,14 @@ def do_GET(req):
                 else:
                     req.wfile.write(bytes(', ' + row, "utf-8") )
             req.wfile.write(bytes(']', "utf-8") )
-        except:
+        except Exception as e:
+            #print(str(e))
             print("get fail: " + req.path)
             req.wfile.write(bytes("false", "utf-8"))
 
     elif q[3] == 'delete':
         try:
-            c.execute("DELETE FROM " + key + " WHERE privUuid = ?;", (q[4],) )
+            c.execute("DELETE FROM " + key + " WHERE privUuid = "+p(pc)+";", (q[4],) )
             req.wfile.write(bytes("true", "utf-8"))
         except:
             print("delete fail: " + req.path)
@@ -105,7 +115,7 @@ def do_GET(req):
 
     elif q[2] == 'dump':
         try:
-            c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
+            c.execute("SELECT publicKey FROM datasets WHERE privateKey = "+p(pc)+";", (q[3],) )
             data = c.fetchone()
             if data is None:
                 print("dump fail: " + req.path)
@@ -113,8 +123,13 @@ def do_GET(req):
             else:
                 req.wfile.write(bytes('[', "utf-8") )
                 first = True
-                for r in c.execute("SELECT * FROM d_" + scrub(data[0]) + ";"):
-                    row = json.dumps(r)
+                if pc is None:
+                    query= c.execute("SELECT * FROM d_" + scrub(data[0]) + ";")
+                else:
+                    c.execute("SELECT row_to_json(d_" + scrub(data[0]) + ") FROM d_" + scrub(data[0]) + ";")
+                    query= c.fetchall()
+                for r in query:
+                    row = json.dumps(r) if pc is None else json.dumps(r[0])
                     if first:
                         req.wfile.write(bytes(row, "utf-8") )
                         first = False
@@ -127,7 +142,7 @@ def do_GET(req):
 
     elif q[2] == 'drop':
         try:
-            c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
+            c.execute("SELECT publicKey FROM datasets WHERE privateKey = "+p(pc)+";", (q[3],) )
             data = c.fetchone()
             if data is None:
                 req.wfile.write(bytes("false", "utf-8"))
@@ -136,7 +151,7 @@ def do_GET(req):
                 cdata = c.fetchone()
                 if cdata[0] == 0:
                     c.execute("DROP TABLE d_" + scrub(data[0]) + ";")
-                    c.execute("DELETE FROM datasets WHERE privateKey = ?", (q[3],) )
+                    c.execute("DELETE FROM datasets WHERE privateKey = "+p(pc)+";", (q[3],) )
                     req.wfile.write(bytes("true", "utf-8"))
                 else:
                     print("not empty: " + req.path)
@@ -166,7 +181,7 @@ def do_GET(req):
                 s = smtplib.SMTP('localhost')
                 s.send_message(msg)
                 s.quit()
-                c.execute("INSERT INTO datasets (privateKey, publicKey, activated, email) VALUES(?, ?, 0, ?);", (privateKey, publicKey, mail) )
+                c.execute("INSERT INTO datasets (privateKey, publicKey, activated, email) VALUES("+p(pc)+", "+p(pc)+", 0, "+p(pc)+");", (privateKey, publicKey, mail) )
                 req.wfile.write(bytes("true", "utf-8"))
         except:
             print("Unexpected error:", sys.exc_info()[0])
@@ -174,14 +189,17 @@ def do_GET(req):
 
     elif q[2] == 'activate':
         try:
-            c.execute("SELECT publicKey FROM datasets WHERE privateKey = ?", (q[3],) )
+            c.execute("SELECT publicKey FROM datasets WHERE privateKey = "+p(pc)+";", (q[3],) )
             data = c.fetchone()
             if data is None:
                 req.wfile.write(bytes("false", "utf-8"))
             else:
-                c.execute("UPDATE datasets SET activated = 1 WHERE privateKey = ?;", (q[3], ) )
+                c.execute("UPDATE datasets SET activated = 1 WHERE privateKey = "+p(pc)+";", (q[3], ) )
                 print("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + ";");
-                c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
+                if pc is None:
+                    c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
+                else:
+                    c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp timestamp DEFAULT CURRENT_TIMESTAMP, location text);");
                 req.wfile.write(bytes('<html><body>Welcome...<br/><br/><a href="https://github.com/tomtor/PDOK-demo-app">Documentation</a></body></html>', "utf-8"))
         except:
             print("Unexpected error:", sys.exc_info()[0])
@@ -189,7 +207,7 @@ def do_GET(req):
 
     elif q[2] == 'readonly':
         try:
-            c.execute("UPDATE datasets SET activated = ? WHERE privateKey = ?;", (1-int(q[4]), q[3]) )
+            c.execute("UPDATE datasets SET activated = "+p(pc)+" WHERE privateKey = "+p(pc)+";", (1-int(q[4]), q[3]) )
             req.wfile.write(bytes("true", "utf-8"))
         except:
             print("Unexpected error:", sys.exc_info()[0])
@@ -200,6 +218,7 @@ def do_GET(req):
         req.wfile.write(bytes("false", "utf-8"))
 
     # Log all requests
-    c.execute("INSERT INTO requests (path) VALUES (?);", (req.path,) )
+    c.execute("INSERT INTO requests (path) VALUES ("+p(pc)+");", (req.path,) )
     conn.commit()
-    conn.close()
+    if pc is None:
+        conn.close()

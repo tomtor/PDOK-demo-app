@@ -10,7 +10,7 @@ A collection of PDOK (http://www.pdok.nl) example applications
 
 * server.py: Implements the server side storage for add-data.html
   * Written in Python3
-  * Stores the added data in an SQLite database.
+  * Stores the added data in an SQLite or PostgreSQL database.
   * Private/public access keys with mail activation
   * With Swagger API documentation: http://v7f.eu/public/PDOK/dist
 
