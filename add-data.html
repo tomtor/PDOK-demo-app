@@ -84,9 +84,12 @@ https://github.com/tomtor/PDOK-demo-app
 		}
 	}
 
+	markers = {};
 	function delObject(key) {
 		$.ajax({url: server+"/delete/"+key});
 		map.closePopup();
+		var marker= markers[key];
+		map.removeLayer(marker);
 	}
 
 	function onMapClick(e) {
@@ -101,8 +104,7 @@ https://github.com/tomtor/PDOK-demo-app
 		var mark = L.marker(e.latlng);
 		mark.addTo(map).bindPopup(pu).openPopup();
 
-		var button = document.getElementById("addButton");
-		button.onclick = function() {
+		$("#addButton").click(function(event) {
 			var gjf = {
 				"type": "Feature",
 				"geometry": {
@@ -121,10 +123,11 @@ https://github.com/tomtor/PDOK-demo-app
 				var pu = "<small>Secret Key: " + result + "</small><br/>Name: <b>" + gjf.properties.name + "</b><br/>" +
 				"Object type: <b>" +  gjf.properties.kind + "</b>" +
 				"<br/><br/><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/>";
-				mark.key= result;
+				//mark.key= result;
+				markers[result]= mark;
 				mark.addTo(map).bindPopup(pu);
 			}})
-		}
+		});
 	}
 
 	map.on('click', onMapClick);
