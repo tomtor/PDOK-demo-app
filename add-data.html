@@ -84,6 +84,11 @@ https://github.com/tomtor/PDOK-demo-app
 		}
 	}
 
+	function delObject(key) {
+		$.ajax({url: server+"/delete/"+key});
+		map.closePopup();
+	}
+
 	function onMapClick(e) {
 		var pu = "Marker at <b>" + e.latlng + "</b>" +
 			"<br />Name: <input id=\"nameInput\" type=\"text\"/><br/><br/>" +
@@ -110,12 +115,15 @@ https://github.com/tomtor/PDOK-demo-app
 				}
 			};
 
-			var msg= server + '/add/' + JSON.stringify(gjf);
-			$.ajax({url: msg, success: function(result){ }});
 			map.closePopup();
-			pu = "Name: <b>" + gjf.properties.name + "</b><br/>" +
-				"Object type: <b>" +  gjf.properties.kind + "</b>";
-			mark.addTo(map).bindPopup(pu);
+			var msg= server + '/add/' + JSON.stringify(gjf);
+			$.ajax({url: msg, success: function(result){
+				var pu = "<small>Secret Key: " + result + "</small><br/>Name: <b>" + gjf.properties.name + "</b><br/>" +
+				"Object type: <b>" +  gjf.properties.kind + "</b>" +
+				"<br/><br/><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/>";
+				mark.key= result;
+				mark.addTo(map).bindPopup(pu);
+			}})
 		}
 	}
 
