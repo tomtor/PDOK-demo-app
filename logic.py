@@ -199,7 +199,7 @@ def do_GET(req, pc):
                 if pc is None:
                     c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);");
                 else:
-                    c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text, ip text, Timestamp timestamp DEFAULT CURRENT_TIMESTAMP, location text);");
+                    c.execute("CREATE TABLE IF NOT EXISTS d_" + scrub(data[0]) + " (uuid text, privUuid text PRIMARY KEY, ip text, Timestamp timestamp DEFAULT CURRENT_TIMESTAMP, location text);");
                 req.wfile.write(bytes('<html><body>Welcome...<br/><br/><a href="https://github.com/tomtor/PDOK-demo-app">Documentation</a></body></html>', "utf-8"))
         except:
             print("Unexpected error:", sys.exc_info()[0])
