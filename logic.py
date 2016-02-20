@@ -96,7 +96,7 @@ def do_GET(req, pc):
                     js["data"]= r[1]
                 js["properties"]["uuid"]= r[0]
                 js["properties"]["ip_info"]= r[2]
-                js["properties"]["timestamp"]= r[3]
+                js["properties"]["timestamp"]= r[3] if pc is None else str(r[3])
                 row = json.dumps(js)
                 if first:
                     req.wfile.write(bytes(row, "utf-8") )
