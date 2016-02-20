@@ -90,6 +90,7 @@ https://github.com/tomtor/PDOK-demo-app
 		map.closePopup();
 		var marker= markers[key];
 		map.removeLayer(marker);
+		$("#"+key).remove();
 	}
 
 	function onMapClick(e) {
