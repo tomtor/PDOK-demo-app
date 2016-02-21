@@ -127,13 +127,11 @@ def do_GET(req, pc):
             else:
                 req.wfile.write(bytes('[', "utf-8") )
                 first = True
-                if pc is None:
-                    query= c.execute("SELECT * FROM d_" + scrub(data[0]) + ";")
-                else:
-                    c.execute("SELECT row_to_json(d_" + scrub(data[0]) + ") FROM d_" + scrub(data[0]) + ";")
+                query= c.execute("SELECT * FROM d_" + scrub(data[0]) + ";")
+                if not pc is None:
                     query= c.fetchall()
                 for r in query:
-                    row = json.dumps(r) if pc is None else json.dumps(r[0])
+                    row = json.dumps(r) if pc is None else json.dumps([r[0],r[1],r[2],str(r[3]),r[4]])
                     if first:
                         req.wfile.write(bytes(row, "utf-8") )
                         first = False
