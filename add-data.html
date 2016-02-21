@@ -39,6 +39,19 @@ https://github.com/tomtor/PDOK-demo-app
 
 	var map = L.map('map', {crs:RDM}).setView([52.15, 5.2], 3);
 
+	var info = L.control({position: 'topleft'});
+	info.onAdd = function (map) {
+	    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+	    this.update();
+	    return this._div;
+	};
+
+	// method that we will use to update the control based on feature properties passed
+	info.update = function (props) {
+	    this._div.innerHTML = '<h4>Your Own Map Data</h4>Click to Add';
+	};
+	info.addTo(map);
+
 	L.tileLayer('http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/{z}/{x}/{y}.png', {
 		tms: true,
 		minZoom: 2,
@@ -141,7 +154,7 @@ https://github.com/tomtor/PDOK-demo-app
 </script>
 <br/>
 <small>
-<div id="delTable" style="height: 70px; border: 1px solid blue; overflow: auto;">
+<div id="delTable">
 <table id="keyTable" >
 <tr>
 <th>Added<br/>Objects</th><th/><th>Save their keys if you want to delete them later...</th>
@@ -151,8 +164,6 @@ https://github.com/tomtor/PDOK-demo-app
 </small>
 
 <div id="helpDiv">
-<p>This demo shows how to add data to a Leaflet map layer.</p>
-
 <p>On each mouse click a new object is added to the map and made visible for every visitor.<br/>
 You can delete them in the same session as long as you don't refresh the page.</p>
 
