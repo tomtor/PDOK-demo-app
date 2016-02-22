@@ -152,6 +152,7 @@ https://github.com/tomtor/PDOK-demo-app
 		markers[key]= null;
 	}
 
+	lastMark= null;
 	function onMapClick(e) {
 		var pu = "Marker at <b>" + e.latlng + "</b>" +
 			"<br />Name: <input id=\"nameInput\" type=\"text\"/><br/><br/>" +
@@ -161,8 +162,10 @@ https://github.com/tomtor/PDOK-demo-app
 				"<option value=\"Building\">Building</option>" +
 			"</select><br/>" +
 			"<br/><input id=\"addButton\" type=\"button\" value=\"Add\"/>";
-		var mark = L.marker(e.latlng);
-		mark.addTo(map).bindPopup(pu).openPopup();
+		if (lastMark)
+			map.removeLayer(lastMark);
+		lastMark = L.marker(e.latlng);
+		lastMark.addTo(map).bindPopup(pu).openPopup();
 
 		$("#addButton").click(function(event) {
 			var gjf = {
@@ -184,15 +187,15 @@ https://github.com/tomtor/PDOK-demo-app
 				var pu = "<small>Secret Key: " + result + "</small><br/>Name: <b>" + gjf.properties.name + "</b><br/>" +
 				"Object type: <b>" +  gjf.properties.kind + "</b>" +
 				"<br/><br/><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/>";
-				markers[result]= mark;
-				mark.bindLabel(gjf.properties.name).addTo(map).bindPopup(pu);
+				markers[result]= lastMark;
+				lastMark.bindLabel(gjf.properties.name).addTo(map).bindPopup(pu);
+				lastMark= null;
 				$("#keyTable").append("<tr id='"+result+"'>"
 					+ "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
 					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td></tr>");
 		
 				if (document.getElementById("pwInput").value.length > 0) {
 					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, document.getElementById("pwInput").value)+"");
-					console.log(CryptoJS.AES.decrypt(gjf.properties.crypt, document.getElementById("pwInput").value)+"");
 					var msg= server + '/update/' + result +'/' + JSON.stringify(gjf);
 					$.ajax({url: msg, success: function(result){} });
 				}
