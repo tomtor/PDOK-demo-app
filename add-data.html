@@ -23,6 +23,7 @@ https://github.com/tomtor/PDOK-demo-app
 <script src="https://rawgithub.com/kartena/Proj4Leaflet/master/lib/proj4-compressed.js"></script>
 <script src="leaflet.label.js"></script>
 <script src="proj4leaflet.js"></script>
+<script src="rollups/aes.js"></script>
 <script>
 	var serverBase = 'https://v7f.eu/pdok-demo-data';
 	var server = serverBase + '/d89d5ee2-d347-11e5-9d78-bcaec5c2cce2';
@@ -39,7 +40,7 @@ https://github.com/tomtor/PDOK-demo-app
 
 	var map = L.map('map', {crs:RDM}).setView([52.15, 5.2], 3);
 
-	var info = L.control({position: 'topleft'});
+	var info = L.control();
 	info.onAdd = function (map) {
 	    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
 	    this.update();
@@ -48,7 +49,8 @@ https://github.com/tomtor/PDOK-demo-app
 
 	// method that we will use to update the control based on feature properties passed
 	info.update = function (props) {
-	    this._div.innerHTML = '<h4>Your Own Map Data</h4>Click to Add';
+	    this._div.innerHTML = '<h4>Your Own Map</h4><table><tr><td>User:</td><td><input id="idInput" size="10" type="text" value="Demo"/></td></tr>'
+		+ '<tr><td>Password:</td><td><input id="pwInput" size="10" value="test" type="text"/></td></tr></table><b><small>Click to add your data</small></b>';
 	};
 	info.addTo(map);
 
@@ -63,6 +65,40 @@ https://github.com/tomtor/PDOK-demo-app
 	var popup = L.popup();
 
 	$.ajax({url: server+"/get/", success: function(result){ markersReceived(result) }});
+
+	function hex2a(hexx) {
+		var hex = hexx.toString();//force conversion
+		var str = '';
+		for (var i = 0; i < hex.length; i += 2)
+			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+		return str;
+	}
+	function a2hex(str) {
+		var arr1 = [];  
+		for (var n = 0, l = str.length; n < l; n ++)   
+		{
+			var hex = Number(str.charCodeAt(n)).toString(16);
+			arr1.push(hex);
+		}
+		return arr1.join('');
+	}
+
+	markers = {};
+
+	function delSecret(crypt) {
+		var pw= document.getElementById("pwInput").value;
+		if (pw.length > 0) {
+			var privKey= CryptoJS.AES.decrypt(hex2a(crypt), pw)+"";
+			privKey= hex2a(privKey);
+			if (privKey[8] == '-') {
+				//console.log(privKey);
+				markers[privKey]= markers[crypt];
+				delObject(privKey);
+				markers[crypt]= null;
+			} else
+				alert("Wrong password...");
+		}
+	}
 
 	function markersReceived(result) {
 		var geojsonMarkerOptions = {
@@ -81,7 +117,11 @@ https://github.com/tomtor/PDOK-demo-app
 					"</small><br/>" +
 					"Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
 					"Object type: <b>" + plotlist[i].properties.kind + "</b>";
-				L.geoJson(plotlist[i], {
+				if (plotlist[i].properties.crypt) {
+					pu= pu + "<br/><br/><input id=\"delCryptButton\" onclick=\"delSecret('"
+						+plotlist[i].properties.crypt+"');\" type=\"button\" value=\"Delete\"/>";
+				}
+				var lm= L.geoJson(plotlist[i], {
 					pointToLayer: function (feature, latlng) {
 						if (plotlist[i].properties.kind == "Animal") 
 							geojsonMarkerOptions.fillColor= "#ff0000";
@@ -94,19 +134,22 @@ https://github.com/tomtor/PDOK-demo-app
 						return L.circleMarker(latlng, geojsonMarkerOptions);
 					}
 				}).bindLabel(plotlist[i].properties.name).addTo(map).bindPopup(pu);
+				if (plotlist[i].properties.crypt) {
+					markers[plotlist[i].properties.crypt]= lm;
+				}
 			}
 			catch (err) {
 			}
 		}
 	}
 
-	markers = {};
 	function delObject(key) {
 		$.ajax({url: server+"/delete/"+key});
 		map.closePopup();
 		var marker= markers[key];
 		map.removeLayer(marker);
 		$("#"+key).remove();
+		markers[key]= null;
 	}
 
 	function onMapClick(e) {
@@ -130,7 +173,8 @@ https://github.com/tomtor/PDOK-demo-app
 				},
 				"properties" : {
 					"name" : document.getElementById("nameInput").value,
-					"kind" : document.getElementById("selInput").value
+					"kind" : document.getElementById("selInput").value,
+					"user" : document.getElementById("idInput").value
 				}
 			};
 
@@ -145,6 +189,13 @@ https://github.com/tomtor/PDOK-demo-app
 				$("#keyTable").append("<tr id='"+result+"'>"
 					+ "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
 					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td></tr>");
+		
+				if (document.getElementById("pwInput").value.length > 0) {
+					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, document.getElementById("pwInput").value)+"");
+					console.log(CryptoJS.AES.decrypt(gjf.properties.crypt, document.getElementById("pwInput").value)+"");
+					var msg= server + '/update/' + result +'/' + JSON.stringify(gjf);
+					$.ajax({url: msg, success: function(result){} });
+				}
 			}})
 		});
 	}
@@ -157,7 +208,7 @@ https://github.com/tomtor/PDOK-demo-app
 <div id="delTable">
 <table id="keyTable" >
 <tr>
-<th>Added<br/>Objects</th><th/><th>Save their keys if you want to delete them later...</th>
+<th>Added<br/>Objects</th><th>Name</th><th>Secret key</th>
 </tr>
 </table>
 </div>
@@ -166,6 +217,7 @@ https://github.com/tomtor/PDOK-demo-app
 <div id="helpDiv">
 <p>On each mouse click a new object is added to the map and made visible for every visitor.<br/>
 You can delete them in the same session as long as you don't refresh the page.</p>
+<p>You can also delete objects in a later session if you use the same password as in the creating session.</p>
 
 <p>The data is stored in an SqlLite or PostgreSQL server database, it is 
 cleared every day...</p>
