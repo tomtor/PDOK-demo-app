@@ -49,8 +49,7 @@ https://github.com/tomtor/PDOK-demo-app
 
 	// method that we will use to update the control based on feature properties passed
 	info.update = function (props) {
-	    this._div.innerHTML = '<h4>Your Own Map</h4><table><tr><td>User:</td><td><input id="idInput" size="10" type="text" value="Demo"/></td></tr>'
-		+ '<tr><td>Password:</td><td><input id="pwInput" size="10" value="test" type="text"/></td></tr></table><b><small>Click to add your data</small></b>';
+	    this._div.innerHTML = '<h4>Your Own Map</h4><br/><b><small>Click to add your data</small></b>';
 	};
 	info.addTo(map);
 
@@ -111,14 +110,15 @@ https://github.com/tomtor/PDOK-demo-app
 		var plotlist= result;
 		for (i= 0; i < plotlist.length; i++) {
 			try {
-				pu = "<small>uuid: " + plotlist[i].properties.uuid + "<br/>" +
-					"timestamp: " + plotlist[i].properties.timestamp + "<br/>" +
-					"IP info: " + plotlist[i].properties.ip_info + "<br/>" +
-					"</small><br/>" +
-					"Name: <b>" + plotlist[i].properties.name + "</b><br/>" +
-					"Object type: <b>" + plotlist[i].properties.kind + "</b>";
+				pu = "<table><small><tr><td>UUID:</td><td>" + plotlist[i].properties.uuid + "</td></tr>" +
+					"<tr><td>Timestamp:</td><td>" + plotlist[i].properties.timestamp + "</td></tr>" +
+					"<tr><td>IP info:</td><td>" + plotlist[i].properties.ip_info +
+					"</td></tr><tr/></small>" +
+					"<tr><td>User:</td><td>" + plotlist[i].properties.user + "</td></tr>" +
+					"<tr><td>Name:</td><td><b>" + plotlist[i].properties.name + "</b></td></tr>" +
+					"<tr><td>Object type:</td><td><b>" + plotlist[i].properties.kind + "</td></tr></table>";
 				if (plotlist[i].properties.crypt) {
-					pu= pu + "<br/><br/><input id=\"delCryptButton\" onclick=\"delSecret('"
+					pu= pu + "<br/><input id=\"delCryptButton\" onclick=\"delSecret('"
 						+plotlist[i].properties.crypt+"');\" type=\"button\" value=\"Delete\"/>";
 				}
 				var lm= L.geoJson(plotlist[i], {
@@ -204,15 +204,19 @@ https://github.com/tomtor/PDOK-demo-app
 
 </script>
 <br/>
+User:<input id="idInput" size="15" type="text" value="Demo"/>
+Password:<input id="pwInput" size="15" value="test" type="text"/>
+<p>
 <small>
 <div id="delTable">
 <table id="keyTable" >
 <tr>
-<th>Added<br/>Objects</th><th>Name</th><th>Secret key</th>
+<th style="text-align:left;width:20%">Added<br/>Objects</th><th style="text-align:left;width:30%;">Name</th><th style="width:50%; text-align:center">Secret key</th>
 </tr>
 </table>
 </div>
 </small>
+</p>
 
 <div id="helpDiv">
 <p>On each mouse click a new object is added to the map and made visible for every visitor.<br/>
