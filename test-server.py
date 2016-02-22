@@ -15,11 +15,19 @@ serverKey = server + key + "/"
 print("readonly: 0")
 print(urllib.request.urlopen(server + "readonly/" + key + "/0").read())
 print("add:")
-print(urllib.request.urlopen(serverKey + "add/"
+pkey= urllib.request.urlopen(serverKey + "add/"
 	+ urllib.parse.quote('''
 		{"type": "Feature", "geometry": {"type": "Point",
 		"coordinates": [6.1884810525762735, 52.678157083226424]},
 		"properties": {"kind": "Animal", "name": "Snake"}}''',
+		safe = '\0')).read()
+print(pkey)
+print("update:")
+print(urllib.request.urlopen(serverKey + "update/" + json.loads(pkey.decode("utf-8")) + "/"
+	+ urllib.parse.quote('''
+		{"type": "Feature", "geometry": {"type": "Point",
+		"coordinates": [6.1884810525762735, 52.678157083226424]},
+		"properties": {"kind": "Animal", "name": "Serpent"}}''',
 		safe = '\0')).read())
 print("readonly: 1")
 print(urllib.request.urlopen(server + "readonly/" + key + "/1").read())
@@ -51,7 +59,7 @@ print(urllib.request.urlopen(serverKey + "delete/" + "ddcf5c18-6725-49f2-bce5-89
 
 print("dump:")
 print(urllib.request.urlopen(server + "dump/" + key).read())
-#sys.exit(0)
+sys.exit(0)
 
 print("drop:")
 print(urllib.request.urlopen(server + "drop/" + key).read())

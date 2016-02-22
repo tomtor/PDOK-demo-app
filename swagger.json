@@ -154,6 +154,42 @@
                 }
             }
         },
+        "/{publicUUID}/update/{privUUID}/{data}": {
+            "get": {
+                "description": "Update object with private key privUUID from database publicUUID. This replaces all data except the privUUID.\n",
+                "parameters": [
+                    {
+                        "name": "publicUUID",
+                        "in": "path",
+                        "description": "Public UUID of the SimpleGeoStore database",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "privUUID",
+                        "in": "path",
+                        "description": "The private UUID of the object to update",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "data",
+                        "in": "path",
+                        "description": "The new data to store",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Response true|false",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/{publicUUID}/get/{like}": {
             "get": {
                 "description": "Retrieve the data which matches the optional SQL LIKE string. The TimeStamp, IP-Address and public UUID are added as properties..\n",

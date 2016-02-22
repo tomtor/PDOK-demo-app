@@ -109,6 +109,15 @@ def do_GET(req, pc):
             print("get fail: " + req.path)
             req.wfile.write(bytes("false", "utf-8"))
 
+    elif q[3] == 'update':
+        try:
+            c.execute("UPDATE " + key + " SET location = "+p(pc)+" WHERE privUuid = "+p(pc)+";", (q[5],q[4]) )
+            req.wfile.write(bytes("true", "utf-8"))
+        except Exception as e:
+            print(str(e))
+            print("update fail: " + req.path)
+            req.wfile.write(bytes("false", "utf-8"))
+
     elif q[3] == 'delete':
         try:
             c.execute("DELETE FROM " + key + " WHERE privUuid = "+p(pc)+";", (q[4],) )
