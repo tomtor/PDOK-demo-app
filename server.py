@@ -18,8 +18,8 @@ from create import create_db
 hostName = "localhost"
 hostPort = 9000
 
-#pgConn = None
-pgConn = psycopg2.connect("dbname='simplestore' user='simple' host='swan.v7f.eu' password='simple'")
+pgConn = None
+#pgConn = psycopg2.connect("dbname='simplestore' user='simple' host='swan.v7f.eu' password='simple'")
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
