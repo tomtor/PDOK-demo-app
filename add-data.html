@@ -175,6 +175,10 @@ https://github.com/tomtor/PDOK-demo-app
 		lastMark.addTo(map).bindPopup(pu).openPopup();
 
 		$("#addButton").click(function(event) {
+			if ($("#nameInput").val().length == 0) {
+				alert("Name is required...");
+				return;
+			}
 			var gjf = {
 				"type": "Feature",
 				"geometry": {
