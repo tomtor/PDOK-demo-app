@@ -158,6 +158,9 @@ https://github.com/tomtor/PDOK-demo-app
 
 	lastMark= null;
 	function onMapClick(e) {
+		var warning= "";
+		if ($("#pwInput").val() == "test")
+			 warning= "(Password is 'test', change it!)";
 		var pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>Marker at:</td><td><b>" + e.latlng + "</b></td></tr>" +
 			"<tr><td>Name:</td><td><input id=\"nameInput\" type=\"text\"/></td></tr>" +
 			"<tr><td><select id=\"selInput\">" +
@@ -165,7 +168,7 @@ https://github.com/tomtor/PDOK-demo-app
 				"<option value=\"Tree\">Tree</option>" +
 				"<option value=\"Building\">Building</option>" +
 			"</select></td></tr>" +
-			"<tr><td><input id=\"addButton\" type=\"button\" value=\"Add\"/></td></tr></table>";
+			"<tr><td><input id=\"addButton\" type=\"button\" value=\"Add\"/></td><td style=\"color: red;\">"+warning+"</td></tr></table>";
 		if (lastMark)
 			map.removeLayer(lastMark);
 		lastMark = L.marker(e.latlng);
@@ -198,7 +201,7 @@ https://github.com/tomtor/PDOK-demo-app
 				var row= $("#keyTable")[0].insertRow(1);
 				row.setAttribute("id",result);
 				row.innerHTML= "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
-					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td>";
+					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result + "</td>";
 		
 				if ($("#pwInput").val().length > 0) {
 					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, $("#pwInput").val())+"");
