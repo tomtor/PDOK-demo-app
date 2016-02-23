@@ -113,17 +113,18 @@ https://github.com/tomtor/PDOK-demo-app
 		var plotlist= result;
 		for (i= 0; i < plotlist.length; i++) {
 			try {
-				pu = "<table><small><tr><td>UUID:</td><td>" + plotlist[i].properties.uuid + "</td></tr>" +
-					"<tr><td>Timestamp:</td><td>" + plotlist[i].properties.timestamp + "</td></tr>" +
-					"<tr><td>IP info:</td><td>" + plotlist[i].properties.ip_info +
-					"</td></tr><tr/></small>" +
+				pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>UUID:</td><td>" + plotlist[i].properties.uuid + "</td></tr>" +
+					"<tr class=\"smallrow\"><td>Timestamp:</td><td>" + plotlist[i].properties.timestamp + "</td></tr>" +
+					"<tr class=\"smallrow\"><td>IP info:</td><td>" + plotlist[i].properties.ip_info +
+					"</td></tr><tr/>" +
 					"<tr><td>User:</td><td>" + plotlist[i].properties.user + "</td></tr>" +
 					"<tr><td>Name:</td><td><b>" + plotlist[i].properties.name + "</b></td></tr>" +
-					"<tr><td>Object type:</td><td><b>" + plotlist[i].properties.kind + "</td></tr></table>";
+					"<tr><td>Object type:</td><td><b>" + plotlist[i].properties.kind + "</td></tr>";
 				if (plotlist[i].properties.crypt) {
-					pu= pu + "<br/><input id=\"delCryptButton\" onclick=\"delSecret('"
-						+plotlist[i].properties.crypt+"');\" type=\"button\" value=\"Delete\"/>";
+					pu= pu + "<tr><td><input id=\"delCryptButton\" onclick=\"delSecret('"
+						+plotlist[i].properties.crypt+"');\" type=\"button\" value=\"Delete\"/></td></tr>";
 				}
+				pu= pu + "</table>";
 				var lm= L.geoJson(plotlist[i], {
 					pointToLayer: function (feature, latlng) {
 						if (plotlist[i].properties.kind == "Animal") 
@@ -157,14 +158,14 @@ https://github.com/tomtor/PDOK-demo-app
 
 	lastMark= null;
 	function onMapClick(e) {
-		var pu = "Marker at <b>" + e.latlng + "</b>" +
-			"<br />Name: <input id=\"nameInput\" type=\"text\"/><br/><br/>" +
-			"<select id=\"selInput\">" +
+		var pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>Marker at:</td><td><b>" + e.latlng + "</b></td></tr>" +
+			"<tr><td>Name:</td><td><input id=\"nameInput\" type=\"text\"/></td></tr>" +
+			"<tr><td><select id=\"selInput\">" +
 				"<option value=\"Animal\">Animal</option>" +
 				"<option value=\"Tree\">Tree</option>" +
 				"<option value=\"Building\">Building</option>" +
-			"</select><br/>" +
-			"<br/><input id=\"addButton\" type=\"button\" value=\"Add\"/>";
+			"</select></td></tr>" +
+			"<tr><td><input id=\"addButton\" type=\"button\" value=\"Add\"/></td></tr></table>";
 		if (lastMark)
 			map.removeLayer(lastMark);
 		lastMark = L.marker(e.latlng);
@@ -187,15 +188,17 @@ https://github.com/tomtor/PDOK-demo-app
 			map.closePopup();
 			var msg= server + '/add/' + JSON.stringify(gjf);
 			$.ajax({url: msg, success: function(result){
-				var pu = "<small>Secret Key: " + result + "</small><br/>Name: <b>" + gjf.properties.name + "</b><br/>" +
-				"Object type: <b>" +  gjf.properties.kind + "</b>" +
-				"<br/><br/><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/>";
+				var pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>Secret Key:</td><td>"
+				+ result + "</td></tr><tr><td>Name:</td><td><b>" + gjf.properties.name + "</td></tr>" +
+				"<tr><td>Object type:</td><td><b>" +  gjf.properties.kind + "</b></td></tr>" +
+				"<tr><td><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td></tr>";
 				markers[result]= lastMark;
 				lastMark.bindLabel(gjf.properties.name).addTo(map).bindPopup(pu);
 				lastMark= null;
-				$("#keyTable").append("<tr id='"+result+"'>"
-					+ "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
-					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td></tr>");
+				var row= document.getElementById("keyTable").insertRow(1);
+				row.setAttribute("id",result);
+				row.innerHTML= "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
+					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td>";
 		
 				if (document.getElementById("pwInput").value.length > 0) {
 					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, document.getElementById("pwInput").value)+"");
@@ -218,25 +221,22 @@ https://github.com/tomtor/PDOK-demo-app
 </table>
 </div>
 <div class="col-sm-8">
-<small>
-<div id="delTable">
+<div id="delTable" class="smallerrow">
 <table id="keyTable" class="table" >
 <tr>
-<th style="text-align:left;width:20%">Added<br/>Objects</th><th style="text-align:left;width:30%;">Name</th><th style="width:50%; text-align:center">Secret key</th>
+<th style="text-align:left;width:20%">Added<br/>Objects</th><th style="text-align:left;width:30%;">Name</th><th style="width:50%; text-align:left">Secret key</th>
 </tr>
 </table>
 </div>
-</small>
 </div>
 </div>
-<br/>
+<p></p>
 <div id="helpDiv">
 <p>On each mouse click a new object is added to the map and made visible for every visitor.</p>
 <p>
 You can delete them in the same session as long as you don't refresh the page.
 You may also delete objects in a later session if you use the same password as in the creating session.
 </p>
-
 <p>The data is stored in an SqlLite or PostgreSQL server database, it is 
 cleared every day...</p>
 </div>
