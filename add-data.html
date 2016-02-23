@@ -195,7 +195,7 @@ https://github.com/tomtor/PDOK-demo-app
 				markers[result]= lastMark;
 				lastMark.bindLabel(gjf.properties.name).addTo(map).bindPopup(pu);
 				lastMark= null;
-				var row= document.getElementById("keyTable").insertRow(1);
+				var row= $("#keyTable")[0].insertRow(1);
 				row.setAttribute("id",result);
 				row.innerHTML= "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
 					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td>";
@@ -251,7 +251,7 @@ Mail: <input id="eMail" type="text"><br/>
 	$("#eMailButton").click(function(event) {
 		var msg= serverBase + '/create/' + $("#eMail").val();
 		$.ajax({url: msg, success: function(result){}});
-		document.getElementById("eMail").value= "Read your mail...";
+		$("#eMail")[0].value= "Read your mail...";
 	});
 </script>
 
