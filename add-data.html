@@ -10,6 +10,8 @@ https://github.com/tomtor/PDOK-demo-app
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <!--
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 -->
@@ -206,21 +208,28 @@ https://github.com/tomtor/PDOK-demo-app
 	map.on('click', onMapClick);
 
 </script>
-<br/>
-User:<input id="idInput" size="10" type="text" value="Demo"/>
-Password:<input id="pwInput" size="10" value="test" type="text"/>
-<p>
+</br>
+<div class="container">
+<div class="row">
+<div class="col-sm-4">
+<table class="table">
+<tr><td>User:</td><td><input id="idInput" size="15" type="text" value="Demo"/></td></tr>
+<tr><td>Password:</td><td><input id="pwInput" size="15" value="test" type="text"/></td></tr>
+</table>
+</div>
+<div class="col-sm-8">
 <small>
 <div id="delTable">
-<table id="keyTable" >
+<table id="keyTable" class="table" >
 <tr>
 <th style="text-align:left;width:20%">Added<br/>Objects</th><th style="text-align:left;width:30%;">Name</th><th style="width:50%; text-align:center">Secret key</th>
 </tr>
 </table>
 </div>
 </small>
-</p>
-
+</div>
+</div>
+<br/>
 <div id="helpDiv">
 <p>On each mouse click a new object is added to the map and made visible for every visitor.<br/>
 You can delete them in the same session as long as you don't refresh the page.</p>
@@ -229,6 +238,8 @@ You can delete them in the same session as long as you don't refresh the page.</
 <p>The data is stored in an SqlLite or PostgreSQL server database, it is 
 cleared every day...</p>
 </div>
+</div>
+
 <hr/>
 <h2>Create your own database by entering your eMail:</h2>
 Mail: <input id="eMail" type="text"><br/>
