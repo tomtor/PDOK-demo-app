@@ -20,6 +20,7 @@ https://github.com/tomtor/PDOK-demo-app
 <link rel="stylesheet" href="demoMap.css" />
 </head>
 <body>
+<div class="container">
 <div id="map"></div>
 <script src="leaflet.js"></script>
 <script src="https://rawgithub.com/kartena/Proj4Leaflet/master/lib/proj4-compressed.js"></script>
@@ -208,8 +209,7 @@ https://github.com/tomtor/PDOK-demo-app
 	map.on('click', onMapClick);
 
 </script>
-</br>
-<div class="container">
+<p></p>
 <div class="row">
 <div class="col-sm-4">
 <table id="userpw" class="table">
@@ -234,7 +234,7 @@ https://github.com/tomtor/PDOK-demo-app
 <p>On each mouse click a new object is added to the map and made visible for every visitor.</p>
 <p>
 You can delete them in the same session as long as you don't refresh the page.
-You may delete objects in a later session if you use the same password as in the creating session.
+You may also delete objects in a later session if you use the same password as in the creating session.
 </p>
 
 <p>The data is stored in an SqlLite or PostgreSQL server database, it is 
