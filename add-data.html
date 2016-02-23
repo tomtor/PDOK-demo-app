@@ -212,7 +212,7 @@ https://github.com/tomtor/PDOK-demo-app
 <div class="container">
 <div class="row">
 <div class="col-sm-4">
-<table class="table">
+<table id="userpw" class="table">
 <tr><td>User:</td><td><input id="idInput" size="15" type="text" value="Demo"/></td></tr>
 <tr><td>Password:</td><td><input id="pwInput" size="15" value="test" type="text"/></td></tr>
 </table>
@@ -231,9 +231,11 @@ https://github.com/tomtor/PDOK-demo-app
 </div>
 <br/>
 <div id="helpDiv">
-<p>On each mouse click a new object is added to the map and made visible for every visitor.<br/>
-You can delete them in the same session as long as you don't refresh the page.</p>
-<p>You can also delete objects in a later session if you use the same password as in the creating session.</p>
+<p>On each mouse click a new object is added to the map and made visible for every visitor.</p>
+<p>
+You can delete them in the same session as long as you don't refresh the page.
+You may delete objects in a later session if you use the same password as in the creating session.
+</p>
 
 <p>The data is stored in an SqlLite or PostgreSQL server database, it is 
 cleared every day...</p>
