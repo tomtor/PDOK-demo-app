@@ -88,7 +88,7 @@ https://github.com/tomtor/PDOK-demo-app
 	markers = {};
 
 	function delSecret(crypt) {
-		var pw= document.getElementById("pwInput").value;
+		var pw= $("#pwInput").val();
 		if (pw.length > 0) {
 			var privKey= CryptoJS.AES.decrypt(hex2a(crypt), pw)+"";
 			privKey= hex2a(privKey);
@@ -179,9 +179,9 @@ https://github.com/tomtor/PDOK-demo-app
 					"coordinates": [ e.latlng.lng , e.latlng.lat ]
 				},
 				"properties" : {
-					"name" : document.getElementById("nameInput").value,
-					"kind" : document.getElementById("selInput").value,
-					"user" : document.getElementById("idInput").value
+					"name" : $("#nameInput").val(),
+					"kind" : $("#selInput").val(),
+					"user" : $("#idInput").val()
 				}
 			};
 
@@ -200,8 +200,8 @@ https://github.com/tomtor/PDOK-demo-app
 				row.innerHTML= "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
 					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result+"</td>";
 		
-				if (document.getElementById("pwInput").value.length > 0) {
-					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, document.getElementById("pwInput").value)+"");
+				if ($("#pwInput").val().length > 0) {
+					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, $("#pwInput").val())+"");
 					var msg= server + '/update/' + result +'/' + JSON.stringify(gjf);
 					$.ajax({url: msg, success: function(result){} });
 				}
@@ -248,14 +248,11 @@ Mail: <input id="eMail" type="text"><br/>
 </div>
 
 <script>
-var button = document.getElementById("eMailButton");
-button.onclick = function() {
-	var msg= serverBase + '/create/' + document.getElementById("eMail").value;
-	ajaxRequest.onreadystatechange = null;
-	ajaxRequest.open('GET', msg, true);
-	ajaxRequest.send(null);
-	document.getElementById("eMail").value= "Read your mail...";
-}
+	$("#eMailButton").click(function(event) {
+		var msg= serverBase + '/create/' + $("#eMail").val();
+		$.ajax({url: msg, success: function(result){}});
+		document.getElementById("eMail").value= "Read your mail...";
+	});
 </script>
 
 </body>
