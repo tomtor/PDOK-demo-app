@@ -1,7 +1,7 @@
 # PDOK-demo-app
 A collection of PDOK (http://www.pdok.nl) example applications
 
-* index.html (http://v7f.eu/public/PDOK)
+* simple.html (http://v7f.eu/public/PDOK/simple.html)
   * Shows a simple Leaflet map.
   * Clicking shows the coordinates.
 
