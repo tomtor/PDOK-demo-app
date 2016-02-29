@@ -228,6 +228,10 @@ def do_GET(req, pc):
         print("unknown operation: " + req.path)
         req.wfile.write(bytes("false", "utf-8"))
 
+    # commit for if we had a Postgres error or we will get an exception on the next execute
+    # and than all future database operation will fail
+    conn.commit()
+
     # Log all requests
     c.execute("INSERT INTO requests (path) VALUES ("+p(pc)+");", (req.path,) )
     conn.commit()
