@@ -1,6 +1,8 @@
 # PDOK-demo-app
 A collection of PDOK (http://www.pdok.nl) example applications
 
+See http://school-crowd.v7f.eu which is built on this framework.
+
 * simple.html (http://v7f.eu/public/PDOK/simple.html)
   * Shows a simple Leaflet map.
   * Clicking shows the coordinates.
