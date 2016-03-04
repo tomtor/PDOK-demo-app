@@ -70,6 +70,10 @@ https://github.com/tomtor/PDOK-demo-app
 
 	$.ajax({url: server+"/get/", success: function(result){ markersReceived(result) }});
 
+	function xss( str ) {
+		// decode &, ', ", >, <
+		return str.replace(/[\'\>\<\"\&]/g, '?');
+	}
 	function hex2a(hexx) {
 		var hex = hexx.toString();//force conversion
 		var str = '';
@@ -115,16 +119,16 @@ https://github.com/tomtor/PDOK-demo-app
 		var plotlist= result;
 		for (i= 0; i < plotlist.length; i++) {
 			try {
-				pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>UUID:</td><td>" + plotlist[i].properties.uuid + "</td></tr>" +
-					"<tr class=\"smallrow\"><td>Timestamp:</td><td>" + plotlist[i].properties.timestamp + "</td></tr>" +
-					"<tr class=\"smallrow\"><td>IP info:</td><td>" + plotlist[i].properties.ip_info +
+				pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>UUID:</td><td>" + xss(plotlist[i].properties.uuid) + "</td></tr>" +
+					"<tr class=\"smallrow\"><td>Timestamp:</td><td>" + xss(plotlist[i].properties.timestamp) + "</td></tr>" +
+					"<tr class=\"smallrow\"><td>IP info:</td><td>" + xss(plotlist[i].properties.ip_info) +
 					"</td></tr><tr/>" +
-					"<tr><td>User:</td><td>" + plotlist[i].properties.user + "</td></tr>" +
-					"<tr><td>Name:</td><td><b>" + plotlist[i].properties.name + "</b></td></tr>" +
-					"<tr><td>Object type:</td><td><b>" + plotlist[i].properties.kind + "</td></tr>";
+					"<tr><td>User:</td><td>" + xss(plotlist[i].properties.user) + "</td></tr>" +
+					"<tr><td>Name:</td><td><b>" + xss(plotlist[i].properties.name) + "</b></td></tr>" +
+					"<tr><td>Object type:</td><td><b>" + xss(plotlist[i].properties.kind) + "</td></tr>";
 				if (plotlist[i].properties.crypt) {
 					pu= pu + "<tr><td><input id=\"delCryptButton\" onclick=\"delSecret('"
-						+plotlist[i].properties.crypt+"');\" type=\"button\" value=\"Delete\"/></td></tr>";
+						+xss(plotlist[i].properties.crypt)+"');\" type=\"button\" value=\"Delete\"/></td></tr>";
 				}
 				pu= pu + "</table>";
 				var lm= L.geoJson(plotlist[i], {
@@ -141,7 +145,7 @@ https://github.com/tomtor/PDOK-demo-app
 					}
 				});
 				if (!hasTouch)
-					lm= lm.bindLabel(plotlist[i].properties.name);
+					lm= lm.bindLabel(xss(plotlist[i].properties.name));
 				lm.addTo(map).bindPopup(pu);
 				if (plotlist[i].properties.crypt) {
 					markers[plotlist[i].properties.crypt]= lm;
@@ -201,16 +205,16 @@ https://github.com/tomtor/PDOK-demo-app
 			var msg= server + '/add/' + JSON.stringify(gjf);
 			$.ajax({url: msg, success: function(result){
 				var pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>Secret Key:</td><td>"
-				+ result + "</td></tr><tr><td>Name:</td><td><b>" + gjf.properties.name + "</td></tr>" +
-				"<tr><td>Object type:</td><td><b>" +  gjf.properties.kind + "</b></td></tr>" +
+				+ result + "</td></tr><tr><td>Name:</td><td><b>" + xss(gjf.properties.name) + "</td></tr>" +
+				"<tr><td>Object type:</td><td><b>" +  xss(gjf.properties.kind) + "</b></td></tr>" +
 				"<tr><td><input id=\"delButton\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td></tr>";
 				markers[result]= lastMark;
-				lastMark.bindLabel(gjf.properties.name).addTo(map).bindPopup(pu);
+				lastMark.bindLabel(xss(gjf.properties.name)).addTo(map).bindPopup(pu);
 				lastMark= null;
 				var row= $("#keyTable")[0].insertRow(1);
 				row.setAttribute("id",result);
 				row.innerHTML= "<td><input id=\"delButton2\" onclick=\"delObject('"+result+"')\" type=\"button\" value=\"Delete\"/></td>"
-					+ "<td><b>" + gjf.properties.name + "</b></td><td>" + result + "</td>";
+					+ "<td><b>" + xss(gjf.properties.name) + "</b></td><td>" + result + "</td>";
 		
 				if ($("#pwInput").val().length > 0) {
 					gjf.properties.crypt= a2hex(CryptoJS.AES.encrypt(result, $("#pwInput").val())+"");
