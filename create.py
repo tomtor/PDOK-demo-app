@@ -23,7 +23,7 @@ def create_db(pgConn):
              Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, location text);''')
     else:
         c.execute('''CREATE TABLE IF NOT EXISTS requests
-             (path text, Timestamp timestamp DEFAULT CURRENT_TIMESTAMP PRIMARY KEY);''')
+             (nr bigserial PRIMARY KEY, path text, Timestamp timestamp DEFAULT CURRENT_TIMESTAMP);''')
         c.execute('''CREATE TABLE IF NOT EXISTS datasets
              (privateKey text PRIMARY KEY, publicKey text, activated integer,
              email text, Timestamp timestamp DEFAULT CURRENT_TIMESTAMP);''')
