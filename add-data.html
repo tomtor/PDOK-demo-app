@@ -202,7 +202,7 @@ https://github.com/tomtor/PDOK-demo-app
 			};
 
 			map.closePopup();
-			var msg= server + '/add/' + JSON.stringify(gjf);
+			var msg= server + '/add/' + encodeURIComponent(JSON.stringify(gjf));
 			$.ajax({url: msg, success: function(result){
 				var pu = "<table style=\"border-collapse: separate; border-spacing: 5px;\"><tr class=\"smallrow\"><td>Secret Key:</td><td>"
 				+ result + "</td></tr><tr><td>Name:</td><td><b>" + xss(gjf.properties.name) + "</td></tr>" +
@@ -265,7 +265,7 @@ Mail: <input id="eMail" type="text"><br/>
 
 <script>
 	$("#eMailButton").click(function(event) {
-		var msg= serverBase + '/create/' + $("#eMail").val();
+		var msg= serverBase + '/create/' + encodeURIComponent($("#eMail").val());
 		$.ajax({url: msg, success: function(result){}});
 		$("#eMail")[0].value= "Read your mail...";
 	});
