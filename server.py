@@ -18,18 +18,24 @@ from create import create_db
 hostName = "localhost"
 hostPort = 9000
 
-pgConn = None
-#pgConn = psycopg2.connect("dbname='simplestore' user='simple' host='swan.v7f.eu' password='simple'")
+conConfig = "dbname='simplestore' user='simple' host='localhost' password='simple'"
+
+pgConn = psycopg2.connect(conConfig)
+
+create_db(pgConn)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
-
-create_db(pgConn)
 
 class MyServer(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
     def do_GET(self):
+        global pgConn
+        try:
+            pgConn.isolation_level
+        except psycopg2.OperationalError:
+            pgConn = psycopg2.connect(conConfig)
         return do_GET(self, pgConn)
 
 
