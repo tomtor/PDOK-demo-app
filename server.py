@@ -15,7 +15,7 @@ import psycopg2
 from logic import do_GET
 from create import create_db
 
-hostName = "localhost"
+hostName = "0.0.0.0"
 hostPort = 9000
 
 conConfig = "dbname='simplestore' user='simple' host='localhost' password='simple'"
